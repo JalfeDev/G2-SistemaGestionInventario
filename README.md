@@ -5,31 +5,31 @@ Grupo 2
 ## Creación de Historias de Usuario
 
 ### 1. Feature: Autenticación de usuarios
-  ** Historia de usuario**
+  **Historia de usuario**
 Como usuario del sistema, quiero iniciar sesión con mis credenciales, para acceder únicamente a las funcionalidades permitidas por mi rol. 
 
-  ** Criterios de aceptación**
+  **Criterios de aceptación**
 - [ ] El sistema solicita nombre de usuario y contraseña antes de permitir accso a cualquier funcionalidad
 - [ ] El sistema restringe el acceso a módulos según el rol asignado al usuario
 - [ ] El sistrema muestra mensaje de error si las credenciales son incorrectas
 
 ### 2. Feature: Gestión de usuarios
-   ** Historia de usuario **
+   **Historia de usuario **
 Como administrador, quiero crear y gestionar usuarios con roles asignados,
 para controlar el acceso al sistema según las responsabilidades de cada persona.
 
-  ** Criterios de aceptación**
+  **Criterios de aceptación**
 - [ ] El administrador puede registrar un nuevo usuario ingresando nombre, apellido, nombre de usuario y rol
 - [ ] Los roles disponibles para asignar son: gerente, encargado de almacén y housekeeping
 - [ ] El administrador puede modificar el rol de un usuario existente
 - [ ] Un usuario sin rol asignado no puede acceder al sistema
 
 ### 3. Feature: Gestión de productos
-   ** Historia de usuario**
+   **Historia de usuario**
 Como administrador, quiero registrar, modificar y eliminar productos del catálogo,
 para mantener actualizada la información de insumos disponibles en el hotel.
 
-  ** Criterios de aceptación**
+  **Criterios de aceptación**
 - [ ] El administrador puede crear un producto ingresando nombre y categoría
 - [ ] El administrador puede editar el nombre y categoría de un producto existente
 - [ ] El administrador puede eliminar un producto cuando corresponda
@@ -48,7 +48,7 @@ para evitar el ingreso manual uno por uno y agilizar la configuración inicial d
 - [ ] La importación no sobreescribe productos existentes sin confirmación del usuario
 
 ### 5. Feature: Configuración del sistema
-  ** Historia de usuario**
+  **Historia de usuario**
 Como administrador, quiero configurar el stock mínimo, categorías y unidades de medida,
 para adaptar el sistema a las necesidades operativas del hotel.
 
@@ -81,7 +81,7 @@ para poder calcular el costo total del inventario y hacer seguimiento de precios
 - [ ] El administrador y gerente pueden consultar el historial de precios por proveedor
       
 ### 8. Feature: Consulta de stock actual
-  ** Historia de usuario**
+  **Historia de usuario**
 Como encargado de almacén, quiero consultar el stock actual disponible por producto,
 para tomar decisiones oportunas sobre reabastecimiento.
 
@@ -92,11 +92,11 @@ para tomar decisiones oportunas sobre reabastecimiento.
 - [ ] La información de stock se muestra en tiempo real
 
 ### 9. Feature: Notificaciones automáticas de stock crítico
-    **Historia de usuario**
+   **Historia de usuario**
 Como encargado de almacén, quiero recibir una notificación automática cuando un producto alcance el stock mínimo,
 para gestionar el reabastecimiento a tiempo.
 
-  ## Criterios de aceptación
+  **Criterios de aceptación**
 - [ ] El sistema genera una notificación automática cuando el stock de un producto es menor o igual al mínimo configurado
 - [ ] La notificación se envía por correo electrónico al encargado de almacén y al gerente
 - [ ] La notificación incluye el nombre del producto, stock actual y stock mínimo
