@@ -31,6 +31,7 @@ Como usuario del sistema, quiero iniciar sesión con mis credenciales, para acce
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P0 |
 | Size | M |
@@ -56,6 +57,7 @@ Como administrador, quiero crear y gestionar usuarios con roles asignados, para 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P0 |
 | Size | L |
@@ -81,6 +83,7 @@ Como administrador, quiero registrar, modificar y eliminar productos del catálo
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
@@ -106,6 +109,7 @@ Como administrador, quiero cargar el catálogo de productos desde un archivo CSV
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P1 |
 | Size | M |
@@ -131,6 +135,7 @@ Como administrador, quiero configurar el stock mínimo, categorías y unidades d
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | L |
@@ -156,6 +161,7 @@ Como encargado de almacén, quiero registrar las entradas de insumos recibidos, 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `database` |
 | Priority | P0 |
 | Size | M |
@@ -181,6 +187,7 @@ Como encargado de almacén, quiero registrar el costo unitario en cada entrada d
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `database` |
 | Priority | P1 |
 | Size | M |
@@ -206,6 +213,7 @@ Como encargado de almacén, quiero consultar el stock actual disponible por prod
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | M |
@@ -231,6 +239,7 @@ Como encargado de almacén, quiero recibir una notificación automática cuando 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` |
 | Priority | P0 |
 | Size | L |
@@ -256,6 +265,7 @@ Como encargado de almacén, quiero generar solicitudes formales de reabastecimie
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | L |
@@ -265,6 +275,7 @@ Como encargado de almacén, quiero generar solicitudes formales de reabastecimie
 | Target Date | 2026-06-30 |
  
 ---
+ 
 ### 11. Feature: Registro de distribución de insumos por housekeeping
  
 **Historia de usuario**  
@@ -280,6 +291,7 @@ Como usuario de housekeeping, quiero registrar los insumos distribuidos por habi
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
@@ -305,6 +317,7 @@ Como gerente, quiero visualizar un dashboard con los principales indicadores de 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | L |
@@ -330,6 +343,7 @@ Como gerente, quiero generar reportes de consumo de inventario por rango de fech
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P0 |
 | Size | M |
@@ -355,6 +369,7 @@ Como gerente, quiero exportar un reporte de costos de insumos por proveedor en P
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P0 |
 | Size | M |
@@ -380,6 +395,7 @@ Como gerente, quiero ver la lista de productos cuyo stock sea igual o menor al m
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
+| Assignee | [Completar] |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | S |
@@ -389,4 +405,3 @@ Como gerente, quiero ver la lista de productos cuyo stock sea igual o menor al m
 | Target Date | 2026-07-14 |
  
 ---
-
