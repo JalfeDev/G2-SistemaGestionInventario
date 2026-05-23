@@ -1,7 +1,17 @@
-# IngSoftwareII-ProyectoGrupal
-Grupo 2 
-
-
+# Sistema de Gestión de Inventario — Hotel Pirámide
+ 
+> **Ingeniería de Software II · Grupo 2**  
+> Universidad de Lima — Facultad de Ingeniería de Sistemas
+ 
+---
+ 
+## Descripción del proyecto
+ 
+Sistema web para gestionar el inventario de insumos del Hotel Pirámide. Permite registrar entradas de productos, controlar el stock disponible, generar alertas de reabastecimiento y producir reportes de consumo y costos por proveedor.
+ 
+El sistema está orientado a cuatro roles principales: **Administrador**, **Gerente**, **Encargado de Almacén** y **Housekeeping**, cada uno con acceso restringido a las funcionalidades de su responsabilidad.
+ 
+---
 ## Creación de Historias de Usuario
 
 ### 1. Feature: Autenticación de usuarios
