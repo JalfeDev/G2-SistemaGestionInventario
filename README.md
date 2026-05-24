@@ -9,10 +9,10 @@
 
 | Nombre | Rol Scrum |
 |--------|-----------|
-| Juan | Product Owner |
+| Juan Loyola | Product Owner |
 | Diago Estrada | Scrum Master |
 | Sebastian García | Developer |
-| Romina | Developer |
+| Romina Rebaza | Developer |
 | Fabricio Carreño | Developer |
 
 ---
@@ -47,14 +47,14 @@ para acceder solo a las funciones que me corresponden según mi rol.
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Juan |
+| Assignee | Juan Loyola |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P0 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 1 |
 | Start Date | 2026-05-25 |
-| Target Date | 2026-06-01 |
+| Target Date | 2026-05-30 |
 
 ---
 
@@ -84,7 +84,7 @@ para controlar quién puede entrar y qué puede hacer.
 | Estimate | 8 pts |
 | Iteration | Sprint 1 |
 | Start Date | 2026-05-25 |
-| Target Date | 2026-06-05 |
+| Target Date | 2026-06-02 |
 
 ---
 
@@ -113,8 +113,8 @@ para mantener actualizada la lista de insumos del hotel.
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 1 |
-| Start Date | 2026-05-30 |
-| Target Date | 2026-06-07 |
+| Start Date | 2026-05-28 |
+| Target Date | 2026-06-04 |
 
 ---
 
@@ -143,8 +143,8 @@ para adaptar el sistema a cómo trabaja el hotel.
 | Size | L |
 | Estimate | 8 pts |
 | Iteration | Sprint 1 |
-| Start Date | 2026-06-01 |
-| Target Date | 2026-06-10 |
+| Start Date | 2026-05-28 |
+| Target Date | 2026-06-05 |
 
 ---
 
@@ -161,7 +161,7 @@ para mantener el stock actualizado y saber cuánto costó cada compra.
 - [ ] Puede registrar una entrada con: producto, cantidad, fecha, proveedor y precio por unidad
 - [ ] El stock del producto sube automáticamente al guardar la entrada
 - [ ] La cantidad debe ser mayor a cero
-- [ ] El sistema calcula solo el costo total de la entrada (cantidad × precio unitario)
+- [ ] El sistema calcula el costo total de la entrada (cantidad × precio unitario)
 - [ ] Queda guardado quién registró la entrada y cuándo
 
 | Propiedad | Valor |
@@ -173,12 +173,41 @@ para mantener el stock actualizado y saber cuánto costó cada compra.
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 1 |
-| Start Date | 2026-06-05 |
-| Target Date | 2026-06-13 |
+| Start Date | 2026-05-30 |
+| Target Date | 2026-06-06 |
 
 ---
 
-### 6. Feature: Registro de distribución por housekeeping
+### 6. Feature: Consulta de stock actual
+
+## Historia de Usuario
+
+Como encargado de almacén,
+quiero ver el stock actual de todos los productos con opción de filtrar,
+para saber qué productos necesitan reabastecerse pronto.
+
+## Criterios de Aceptación
+
+- [ ] Muestra todos los productos con su stock actual, mínimo y categoría
+- [ ] Se puede filtrar por categoría o buscar por nombre
+- [ ] Los productos con stock igual o menor al mínimo se resaltan visualmente
+- [ ] La información está siempre actualizada
+
+| Propiedad | Valor |
+|-----------|-------|
+| Status | Todo |
+| Assignee | Romina Rebaza |
+| Labels | `enhancement` `frontend` `backend` |
+| Priority | P1 |
+| Size | M |
+| Estimate | 5 pts |
+| Iteration | Sprint 1 |
+| Start Date | 2026-06-01 |
+| Target Date | 2026-06-07 |
+
+---
+
+### 7. Feature: Registro de distribución por housekeeping
 
 ## Historia de Usuario
 
@@ -201,38 +230,9 @@ para llevar el control del consumo y que el stock se descuente correctamente.
 | Priority | P1 |
 | Size | M |
 | Estimate | 5 pts |
-| Iteration | Sprint 1 |
-| Start Date | 2026-06-08 |
-| Target Date | 2026-06-15 |
-
----
-
-### 7. Feature: Consulta de stock actual
-
-## Historia de Usuario
-
-Como encargado de almacén,
-quiero ver el stock actual de todos los productos con opción de filtrar,
-para saber qué productos necesitan reabastecerse pronto.
-
-## Criterios de Aceptación
-
-- [ ] Muestra todos los productos con su stock actual, mínimo y categoría
-- [ ] Se puede filtrar por categoría o buscar por nombre
-- [ ] Los productos con stock igual o menor al mínimo se resaltan visualmente
-- [ ] La información está siempre actualizada
-
-| Propiedad | Valor |
-|-----------|-------|
-| Status | Todo |
-| Assignee | Romina |
-| Labels | `enhancement` `frontend` `backend` |
-| Priority | P1 |
-| Size | M |
-| Estimate | 5 pts |
-| Iteration | Sprint 1 |
-| Start Date | 2026-06-08 |
-| Target Date | 2026-06-15 |
+| Iteration | Sprint 2 |
+| Start Date | 2026-06-09 |
+| Target Date | 2026-06-16 |
 
 ---
 
@@ -241,7 +241,7 @@ para saber qué productos necesitan reabastecerse pronto.
 ## Historia de Usuario
 
 Como administrador,
-quiero cargar el catálogo de productos desde un archivo Excel o CSV,
+quiero cargar el catálogo de productos desde un archivo CSV,
 para no tener que ingresar uno por uno cuando hay muchos productos.
 
 ## Criterios de Aceptación
@@ -255,14 +255,14 @@ para no tener que ingresar uno por uno cuando hay muchos productos.
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Romina |
+| Assignee | Romina Rebaza |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P1 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-06-20 |
-| Target Date | 2026-06-27 |
+| Start Date | 2026-06-09 |
+| Target Date | 2026-06-18 |
 
 ---
 
@@ -290,8 +290,8 @@ para comparar cuánto ha costado cada insumo en distintas fechas.
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-06-20 |
-| Target Date | 2026-06-27 |
+| Start Date | 2026-06-09 |
+| Target Date | 2026-06-20 |
 
 ---
 
@@ -319,8 +319,8 @@ para poder hacer el pedido a tiempo y evitar que se acabe.
 | Size | L |
 | Estimate | 8 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-06-23 |
-| Target Date | 2026-07-02 |
+| Start Date | 2026-06-18 |
+| Target Date | 2026-06-30 |
 
 ---
 
@@ -349,8 +349,8 @@ para que quede un registro formal de cada pedido y su estado.
 | Size | L |
 | Estimate | 8 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-06-25 |
-| Target Date | 2026-07-05 |
+| Start Date | 2026-06-22 |
+| Target Date | 2026-07-03 |
 
 ---
 
@@ -373,14 +373,14 @@ para tener una visión rápida del estado actual sin revisar reporte por reporte
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Juan |
+| Assignee | Juan Loyola |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | L |
 | Estimate | 8 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-06-28 |
-| Target Date | 2026-07-08 |
+| Start Date | 2026-06-25 |
+| Target Date | 2026-07-07 |
 
 ---
 
@@ -410,7 +410,7 @@ para analizar cuánto se usa de cada insumo y planificar las compras.
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
 | Start Date | 2026-07-01 |
-| Target Date | 2026-07-09 |
+| Target Date | 2026-07-10 |
 
 ---
 
@@ -438,8 +438,8 @@ para saber con quién conviene seguir comprando.
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-07-03 |
-| Target Date | 2026-07-11 |
+| Start Date | 2026-07-06 |
+| Target Date | 2026-07-14 |
 
 ---
 
@@ -462,14 +462,14 @@ para saber qué hay que pedir con más urgencia.
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Romina |
+| Assignee | Romina Rebaza |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | S |
 | Estimate | 3 pts |
 | Iteration | Sprint 2 |
 | Start Date | 2026-07-08 |
-| Target Date | 2026-07-14 |
+| Target Date | 2026-07-17 |
 
 ---
 
@@ -477,6 +477,6 @@ para saber qué hay que pedir con más urgencia.
 
 | Sprint | HUs | Puntos | Fechas |
 |--------|-----|--------|--------|
-| Sprint 1 | HU-01 al HU-07 | 41 pts | 25/05 → 19/06 |
-| Sprint 2 | HU-08 al HU-15 | 47 pts | 20/06 → 17/07 |
+| Sprint 1 | HU-01 al HU-06 | 31 pts | 2026-05-25 → 2026-06-07 |
+| Sprint 2 | HU-07 al HU-15 | 57 pts | 2026-06-09 → 2026-07-17 |
 | **Total** | **15 HU** | **88 pts** | **8 semanas** |
