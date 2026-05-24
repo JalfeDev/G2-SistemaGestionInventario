@@ -1,29 +1,27 @@
 # Sistema de Gestión de Inventario — Hotel Pirámide
 
-> **Ingeniería de Software II · Grupo 2**
+> **Ingeniería de Software II · Grupo 2**  
 > Universidad de Lima — Facultad de Ingeniería de Sistemas
 
 ---
 
 ## Equipo
 
-| Nombre | Rol Scrum | Responsabilidad principal |
-|--------|-----------|--------------------------|
-| Juan | Product Owner | Arquitectura backend, Spring Boot, JWT, Dashboard |
-| Diago Estrada | Scrum Master | Coordinación del equipo, CRUD base, Solicitudes de reabastecimiento |
-| Sebastian García | Developer | Entradas de insumos, Distribución, Notificaciones por correo, Historial de precios |
-| Romina | Developer | Frontend React, Importación CSV, Consulta de stock, Alertas visuales |
-| Fabricio Carreño | Developer | Reportes PDF, Documentación, Informe Release 1 |
+| Nombre | Rol Scrum |
+|--------|-----------|
+| Juan | Product Owner |
+| Diago Estrada | Scrum Master |
+| Sebastian García | Developer |
+| Romina | Developer |
+| Fabricio Carreño | Developer |
 
 ---
 
 ## Descripción del proyecto
 
-Sistema web para gestionar el inventario de insumos del Hotel Pirámide. Permite registrar entradas de productos, controlar el stock disponible, generar alertas de reabastecimiento automáticas por correo y producir reportes de consumo y costos por proveedor.
+Sistema web para gestionar el inventario de insumos del Hotel Pirámide. Permite registrar entradas de productos, controlar el stock, generar alertas de reabastecimiento y producir reportes de consumo y costos por proveedor.
 
-El sistema está orientado a cuatro roles principales: **Administrador**, **Gerente**, **Encargado de Almacén** y **Housekeeping**, cada uno con acceso restringido a las funcionalidades de su responsabilidad.
-
-**Stack tecnológico:** React (Vite) · Java Spring Boot · Spring Security + JWT · JPA/Hibernate · MySQL · JavaMailSender
+Roles del sistema: **Administrador**, **Gerente**, **Encargado de Almacén** y **Housekeeping**.
 
 ---
 
@@ -31,30 +29,26 @@ El sistema está orientado a cuatro roles principales: **Administrador**, **Gere
 
 ---
 
-## Sprint 1 — Base del sistema
-**Fechas:** 2026-05-25 → 2026-06-19 · **Meta:** Sistema base funcional con autenticación, productos, entradas y distribuciones en React + Java
-
----
-
 ### 1. Feature: Autenticación de usuarios
 
-**Historia de usuario**
-Como usuario del sistema, quiero iniciar sesión con mi nombre de usuario y contraseña, para acceder únicamente a las funcionalidades permitidas por mi rol.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El sistema solicita nombre de usuario y contraseña antes de permitir acceso a cualquier pantalla
-- [ ] Si las credenciales son incorrectas, el sistema muestra el mensaje "Usuario o contraseña incorrectos" sin especificar cuál falló
-- [ ] El sistema redirige al dashboard correspondiente según el rol: Gerente, Administrador, Almacén o Housekeeping
-- [ ] El token JWT se genera al iniciar sesión y expira a las 8 horas
-- [ ] El sistema cierra la sesión y elimina el token al hacer clic en "Cerrar sesión"
+Como usuario del sistema,
+quiero iniciar sesión con mi nombre de usuario y contraseña,
+para acceder solo a las funciones que me corresponden según mi rol.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] El sistema pide usuario y contraseña antes de mostrar cualquier pantalla
+- [ ] Si los datos son incorrectos, muestra un mensaje de error
+- [ ] Cada rol ve un menú distinto al entrar: Gerente, Administrador, Almacén o Housekeeping
+- [ ] Al cerrar sesión el sistema regresa a la pantalla de login
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Juan (Product Owner) |
-| Labels | `enhancement` `backend` `frontend` `security` |
+| Assignee | Juan |
+| Labels | `enhancement` `backend` `frontend` |
 | Priority | P0 |
 | Size | M |
 | Estimate | 5 pts |
@@ -66,23 +60,24 @@ Como usuario del sistema, quiero iniciar sesión con mi nombre de usuario y cont
 
 ### 2. Feature: Gestión de usuarios
 
-**Historia de usuario**
-Como administrador, quiero crear, modificar y consultar usuarios con sus roles asignados, para controlar el acceso al sistema según las responsabilidades de cada persona.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El administrador puede registrar un usuario ingresando: nombre, apellido, nombre de usuario y rol
-- [ ] El sistema no permite registrar dos usuarios con el mismo nombre de usuario
+Como administrador,
+quiero crear y administrar los usuarios del sistema con sus roles,
+para controlar quién puede entrar y qué puede hacer.
+
+## Criterios de Aceptación
+
+- [ ] Puede registrar un usuario ingresando nombre, apellido, nombre de usuario y rol
+- [ ] No permite registrar dos usuarios con el mismo nombre de usuario
 - [ ] Los roles disponibles son: Gerente, Encargado de Almacén y Housekeeping
-- [ ] El administrador puede cambiar el rol de un usuario existente
-- [ ] El administrador puede desactivar un usuario para que no pueda iniciar sesión sin eliminarlo del sistema
-- [ ] La contraseña se almacena encriptada con BCrypt — nunca en texto plano
-
-**Propiedades del Issue**
+- [ ] Puede cambiar el rol de un usuario existente
+- [ ] Puede desactivar un usuario para que no pueda ingresar al sistema
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Diago Estrada (Scrum Master) |
+| Assignee | Diago Estrada |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P0 |
 | Size | L |
@@ -93,24 +88,26 @@ Como administrador, quiero crear, modificar y consultar usuarios con sus roles a
 
 ---
 
-### 3. Feature: Gestión de productos y catálogo
+### 3. Feature: Gestión de productos
 
-**Historia de usuario**
-Como administrador, quiero registrar, editar, eliminar y consultar productos del catálogo, para mantener actualizada la información de insumos disponibles en el hotel.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El administrador puede crear un producto indicando: nombre, categoría y unidad de medida
-- [ ] El sistema no permite registrar dos productos con el mismo nombre dentro de la misma categoría
-- [ ] El administrador puede editar nombre, categoría y unidad de medida de un producto existente
-- [ ] El administrador puede eliminar un producto solo si no tiene movimientos de stock registrados
-- [ ] La lista de productos muestra nombre, categoría, stock actual y stock mínimo
+Como administrador,
+quiero registrar, editar y eliminar productos del catálogo,
+para mantener actualizada la lista de insumos del hotel.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Puede registrar un producto con nombre, categoría y unidad de medida
+- [ ] No permite registrar dos productos con el mismo nombre en la misma categoría
+- [ ] Puede editar los datos de un producto existente
+- [ ] Solo puede eliminar un producto si no tiene movimientos registrados
+- [ ] La lista muestra nombre, categoría, stock actual y stock mínimo de cada producto
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Diago Estrada (Scrum Master) |
+| Assignee | Diago Estrada |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
@@ -123,22 +120,24 @@ Como administrador, quiero registrar, editar, eliminar y consultar productos del
 
 ### 4. Feature: Configuración del sistema
 
-**Historia de usuario**
-Como administrador, quiero configurar el stock mínimo por producto, categorías y unidades de medida, para adaptar el sistema a las necesidades operativas del hotel.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El administrador puede definir y modificar el stock mínimo de cada producto individualmente
-- [ ] El administrador puede crear, editar y eliminar categorías de productos
-- [ ] El administrador puede crear, editar y eliminar unidades de medida
-- [ ] No se puede eliminar una categoría que tenga productos asignados — el sistema muestra un mensaje de advertencia
-- [ ] Los cambios de configuración se reflejan de inmediato en el sistema sin necesidad de recargar la página
+Como administrador,
+quiero configurar el stock mínimo, las categorías y las unidades de medida,
+para adaptar el sistema a cómo trabaja el hotel.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Puede definir y modificar el stock mínimo de cada producto
+- [ ] Puede crear, editar y eliminar categorías de productos
+- [ ] Puede crear, editar y eliminar unidades de medida
+- [ ] No se puede eliminar una categoría que tenga productos asignados
+- [ ] Los cambios se ven reflejados de inmediato en el sistema
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Diago Estrada (Scrum Master) |
+| Assignee | Diago Estrada |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | L |
@@ -149,25 +148,26 @@ Como administrador, quiero configurar el stock mínimo por producto, categorías
 
 ---
 
-### 5. Feature: Registro de entradas de insumos con costo por proveedor
+### 5. Feature: Registro de entradas de insumos
 
-**Historia de usuario**
-Como encargado de almacén, quiero registrar las entradas de insumos recibidos indicando proveedor y costo unitario, para mantener actualizado el stock y el historial de costos por proveedor.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El encargado registra una entrada indicando: producto, cantidad, fecha, proveedor y costo unitario
-- [ ] El stock del producto se actualiza automáticamente sumando la cantidad ingresada
-- [ ] El sistema valida que la cantidad sea mayor a cero
-- [ ] El sistema calcula automáticamente el costo total de la entrada (cantidad × costo unitario)
-- [ ] El registro queda almacenado con fecha, hora y usuario que realizó la entrada
-- [ ] Si el proveedor no existe en el sistema, el encargado puede crearlo en el momento del registro
+Como encargado de almacén,
+quiero registrar las entradas de insumos indicando el proveedor y el precio pagado,
+para mantener el stock actualizado y saber cuánto costó cada compra.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Puede registrar una entrada con: producto, cantidad, fecha, proveedor y precio por unidad
+- [ ] El stock del producto sube automáticamente al guardar la entrada
+- [ ] La cantidad debe ser mayor a cero
+- [ ] El sistema calcula solo el costo total de la entrada (cantidad × precio unitario)
+- [ ] Queda guardado quién registró la entrada y cuándo
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Sebastian García (Developer) |
+| Assignee | Sebastian García |
 | Labels | `enhancement` `backend` `database` |
 | Priority | P0 |
 | Size | M |
@@ -178,24 +178,25 @@ Como encargado de almacén, quiero registrar las entradas de insumos recibidos i
 
 ---
 
-### 6. Feature: Registro de distribución de insumos por housekeeping
+### 6. Feature: Registro de distribución por housekeeping
 
-**Historia de usuario**
-Como usuario de housekeeping, quiero registrar los insumos distribuidos por habitación atendida, para llevar control del consumo real y descontar del stock disponible.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El usuario registra: insumo, cantidad y habitación atendida
-- [ ] El stock del producto se descuenta automáticamente al confirmar la distribución
-- [ ] El sistema impide registrar una distribución mayor al stock disponible y muestra el stock actual disponible
-- [ ] El sistema dispara automáticamente el evento de alerta si el stock resultante queda en o bajo el mínimo configurado
-- [ ] El historial de distribuciones puede consultarse filtrado por fecha o habitación
+Como personal de housekeeping,
+quiero registrar los insumos que uso en cada habitación,
+para llevar el control del consumo y que el stock se descuente correctamente.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Puede registrar el insumo usado, la cantidad y la habitación atendida
+- [ ] El stock del producto baja automáticamente al confirmar el registro
+- [ ] El sistema no permite registrar más cantidad de la que hay en stock
+- [ ] Se puede revisar el historial de distribuciones por fecha o habitación
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Sebastian García (Developer) |
+| Assignee | Sebastian García |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
@@ -208,22 +209,23 @@ Como usuario de housekeeping, quiero registrar los insumos distribuidos por habi
 
 ### 7. Feature: Consulta de stock actual
 
-**Historia de usuario**
-Como encargado de almacén, quiero consultar el stock actual disponible por producto con filtros, para tomar decisiones oportunas sobre reabastecimiento.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] La lista muestra todos los productos con su stock actual, stock mínimo y categoría
-- [ ] El sistema permite filtrar por categoría y buscar por nombre de producto
-- [ ] Los productos con stock igual o menor al mínimo se destacan visualmente en rojo con el déficit calculado
-- [ ] La información de stock se muestra en tiempo real sin necesidad de recargar la página
-- [ ] La lista puede ordenarse por nombre, categoría o nivel de urgencia (menor diferencia stock actual vs mínimo)
+Como encargado de almacén,
+quiero ver el stock actual de todos los productos con opción de filtrar,
+para saber qué productos necesitan reabastecerse pronto.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Muestra todos los productos con su stock actual, mínimo y categoría
+- [ ] Se puede filtrar por categoría o buscar por nombre
+- [ ] Los productos con stock igual o menor al mínimo se resaltan visualmente
+- [ ] La información está siempre actualizada
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Romina (Developer) |
+| Assignee | Romina |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | M |
@@ -234,30 +236,26 @@ Como encargado de almacén, quiero consultar el stock actual disponible por prod
 
 ---
 
-## Sprint 2 — Funcionalidades nuevas
-**Fechas:** 2026-06-20 → 2026-07-17 · **Meta:** Las 5 funcionalidades del profesor + reportes PDF + alertas visuales para el gerente
+### 8. Feature: Importación de productos desde CSV
 
----
+## Historia de Usuario
 
-### 8. Feature: Importación masiva de productos desde CSV
+Como administrador,
+quiero cargar el catálogo de productos desde un archivo Excel o CSV,
+para no tener que ingresar uno por uno cuando hay muchos productos.
 
-**Historia de usuario**
-Como administrador, quiero cargar el catálogo de productos desde un archivo CSV, para evitar el ingreso manual uno por uno y agilizar la configuración inicial del sistema.
+## Criterios de Aceptación
 
-**Criterios de aceptación**
-- [ ] El sistema acepta archivos .csv con columnas: nombre, categoría y unidad de medida
-- [ ] Antes de importar, el sistema muestra una tabla de vista previa con los registros detectados
-- [ ] El sistema importa solo los registros válidos y muestra un resumen: cuántos se importaron correctamente y cuáles tuvieron error con el motivo específico fila por fila
-- [ ] El sistema rechaza registros con campos obligatorios vacíos o con nombre de producto duplicado
-- [ ] La importación no sobreescribe productos existentes — los duplicados se reportan como error sin modificar el original
-- [ ] La interfaz incluye un archivo CSV de ejemplo descargable con el formato esperado
-
-**Propiedades del Issue**
+- [ ] Acepta archivos .csv con columnas: nombre, categoría y unidad de medida
+- [ ] Muestra un resumen de cuántos productos se importaron y cuáles tuvieron error
+- [ ] Indica el motivo del error por cada fila que falló
+- [ ] No sobreescribe productos que ya existen en el sistema
+- [ ] Hay un archivo de ejemplo descargable para guiar el formato
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Romina (Developer) |
+| Assignee | Romina |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P1 |
 | Size | M |
@@ -270,21 +268,23 @@ Como administrador, quiero cargar el catálogo de productos desde un archivo CSV
 
 ### 9. Feature: Historial de precios por proveedor
 
-**Historia de usuario**
-Como encargado de almacén, quiero consultar el historial de precios de cada producto por proveedor, para comparar costos entre fechas y proveedores y optimizar las compras.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El gerente y el administrador pueden consultar el historial de precios filtrado por proveedor o por producto
-- [ ] El historial muestra: fecha de entrada, producto, cantidad, costo unitario y costo total
-- [ ] Los registros se muestran ordenados de más reciente a más antiguo
-- [ ] El sistema calcula y muestra el precio promedio por producto y proveedor en el período consultado
+Como encargado de almacén,
+quiero consultar el historial de precios de cada producto por proveedor,
+para comparar cuánto ha costado cada insumo en distintas fechas.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Se puede filtrar por proveedor o por producto
+- [ ] Muestra: fecha, producto, cantidad comprada, precio por unidad y costo total
+- [ ] Los registros aparecen del más reciente al más antiguo
+- [ ] Muestra el precio promedio del producto con ese proveedor
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Sebastian García (Developer) |
+| Assignee | Sebastian García |
 | Labels | `enhancement` `backend` `database` |
 | Priority | P1 |
 | Size | M |
@@ -295,24 +295,25 @@ Como encargado de almacén, quiero consultar el historial de precios de cada pro
 
 ---
 
-### 10. Feature: Notificaciones automáticas de stock crítico por correo
+### 10. Feature: Notificaciones automáticas de stock crítico
 
-**Historia de usuario**
-Como sistema, quiero enviar una notificación automática por correo cuando el stock de un producto baje del mínimo, para que el encargado de almacén y el gerente gestionen el reabastecimiento a tiempo.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El sistema detecta automáticamente cuando el stock de un producto es menor o igual al mínimo configurado
-- [ ] Se envía un correo al encargado de almacén y al gerente con: nombre del producto, stock actual, stock mínimo y déficit
-- [ ] No se generan correos duplicados por el mismo producto hasta que su stock supere el mínimo nuevamente
-- [ ] El correo incluye un enlace directo al módulo de solicitudes de reabastecimiento
-- [ ] El sistema registra cada notificación enviada con fecha, producto y destinatarios para auditoría
+Como encargado de almacén,
+quiero recibir un correo automático cuando el stock de un producto baje del mínimo,
+para poder hacer el pedido a tiempo y evitar que se acabe.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] El sistema detecta automáticamente cuando el stock llega o baja del mínimo
+- [ ] Envía un correo al encargado de almacén y al gerente con el nombre del producto, stock actual y el mínimo configurado
+- [ ] No manda el mismo correo dos veces para el mismo producto hasta que el stock vuelva a subir
+- [ ] El correo incluye un enlace para ir directamente al módulo de solicitudes
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Sebastian García (Developer) |
+| Assignee | Sebastian García |
 | Labels | `enhancement` `backend` |
 | Priority | P0 |
 | Size | L |
@@ -325,23 +326,24 @@ Como sistema, quiero enviar una notificación automática por correo cuando el s
 
 ### 11. Feature: Módulo de solicitudes de reabastecimiento
 
-**Historia de usuario**
-Como encargado de almacén, quiero generar solicitudes formales de reabastecimiento para aprobación del gerente, para dejar trazabilidad del proceso de compra y evitar compras no autorizadas.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El encargado crea una solicitud indicando: producto, cantidad requerida y motivo
-- [ ] La solicitud queda en estado PENDIENTE hasta que el gerente la procese
-- [ ] El gerente puede aprobar o rechazar la solicitud — si rechaza debe ingresar el motivo
-- [ ] El encargado puede consultar el estado de sus solicitudes con el historial completo: fechas, estado y comentarios del gerente
-- [ ] El sistema notifica al encargado por correo cuando su solicitud es aprobada o rechazada
-- [ ] El historial de solicitudes es visible para el administrador y el gerente con filtros por estado y fecha
+Como encargado de almacén,
+quiero enviar solicitudes de reabastecimiento al gerente para que las apruebe,
+para que quede un registro formal de cada pedido y su estado.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Puede crear una solicitud indicando producto, cantidad y motivo
+- [ ] La solicitud aparece como pendiente hasta que el gerente la revise
+- [ ] El gerente puede aprobarla o rechazarla, y si rechaza debe escribir el motivo
+- [ ] El encargado puede ver el estado de todas sus solicitudes enviadas
+- [ ] El encargado recibe un correo cuando su solicitud es aprobada o rechazada
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Diago Estrada (Scrum Master) |
+| Assignee | Diago Estrada |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | L |
@@ -354,23 +356,24 @@ Como encargado de almacén, quiero generar solicitudes formales de reabastecimie
 
 ### 12. Feature: Dashboard de indicadores para el gerente
 
-**Historia de usuario**
-Como gerente, quiero visualizar un dashboard con los principales indicadores de inventario, para tomar decisiones basadas en datos actualizados sin necesitar reportes manuales.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El dashboard muestra un gráfico de barras con el top 5 de productos más consumidos en los últimos 30 días
-- [ ] El dashboard muestra un gráfico circular con el consumo total agrupado por categoría
-- [ ] El dashboard muestra un gráfico de línea con la tendencia de stock de los últimos 30 días para los productos más críticos
-- [ ] Los datos se actualizan automáticamente al cargar la página sin necesidad de recarga manual
-- [ ] El dashboard solo es visible para el rol Gerente
-- [ ] Al hacer clic en cualquier producto del top 5 se muestra el detalle de sus movimientos
+Como gerente,
+quiero ver un panel con los indicadores principales del inventario,
+para tener una visión rápida del estado actual sin revisar reporte por reporte.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Muestra los 5 productos más consumidos en los últimos 30 días
+- [ ] Muestra el consumo total agrupado por categoría en un gráfico
+- [ ] Muestra cómo ha variado el stock en los últimos 30 días
+- [ ] La información se actualiza cada vez que entra al panel
+- [ ] Solo el gerente puede ver esta pantalla
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Juan (Product Owner) · Diago Estrada (Scrum Master) |
+| Assignee | Juan |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | L |
@@ -381,24 +384,26 @@ Como gerente, quiero visualizar un dashboard con los principales indicadores de 
 
 ---
 
-### 13. Feature: Reporte de consumo de inventario con export PDF
+### 13. Feature: Reporte de consumo de inventario
 
-**Historia de usuario**
-Como gerente, quiero generar reportes de consumo de inventario por rango de fechas y exportarlos en PDF, para analizar el uso de insumos y tomar decisiones de compra informadas.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El gerente selecciona fecha inicio y fecha fin para generar el reporte
-- [ ] El reporte muestra: nombre del producto, categoría y cantidad consumida en el período
-- [ ] Los datos se muestran agrupados por categoría con subtotales por grupo
-- [ ] El reporte puede exportarse en formato PDF con el nombre del hotel, fechas del período y fecha de generación
-- [ ] Si no hay movimientos en el rango seleccionado, el sistema muestra el mensaje "No existen consumos registrados en el período indicado"
+Como gerente,
+quiero generar un reporte de consumo por rango de fechas y descargarlo en PDF,
+para analizar cuánto se usa de cada insumo y planificar las compras.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Puede elegir una fecha de inicio y una fecha de fin
+- [ ] El reporte muestra el producto, categoría y cantidad consumida en ese período
+- [ ] Los datos están agrupados por categoría con un subtotal por cada una
+- [ ] Se puede descargar en PDF
+- [ ] Si no hay movimientos en ese rango, muestra un mensaje indicándolo
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Fabricio Carreño (Developer) |
+| Assignee | Fabricio Carreño |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P0 |
 | Size | M |
@@ -409,24 +414,25 @@ Como gerente, quiero generar reportes de consumo de inventario por rango de fech
 
 ---
 
-### 14. Feature: Reporte de costos por proveedor con export PDF
+### 14. Feature: Reporte de costos por proveedor
 
-**Historia de usuario**
-Como gerente, quiero generar y exportar en PDF un reporte de costos de insumos por proveedor, para evaluar el gasto por proveedor y optimizar las decisiones de compra.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El gerente puede filtrar el reporte por proveedor, por rango de fechas, o por ambos
-- [ ] El reporte muestra por proveedor: productos suministrados, cantidad total, costo unitario por entrada y costo total acumulado
-- [ ] El reporte puede exportarse en formato PDF con la misma estructura visual del reporte en pantalla
-- [ ] El PDF incluye el costo total calculado por proveedor y un resumen al final con el total general
-- [ ] El reporte se genera en menos de 5 segundos para períodos de hasta 12 meses
+Como gerente,
+quiero ver un reporte de cuánto se ha gastado por proveedor y descargarlo en PDF,
+para saber con quién conviene seguir comprando.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Se puede filtrar por proveedor, por fechas o por ambos
+- [ ] Muestra por proveedor: productos comprados, cantidades, precio por unidad y total gastado
+- [ ] Se puede descargar en PDF con el mismo contenido que se ve en pantalla
+- [ ] El PDF muestra el total por proveedor y un total general al final
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Fabricio Carreño (Developer) |
+| Assignee | Fabricio Carreño |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P0 |
 | Size | M |
@@ -439,22 +445,24 @@ Como gerente, quiero generar y exportar en PDF un reporte de costos de insumos p
 
 ### 15. Feature: Visualización de alertas de stock mínimo
 
-**Historia de usuario**
-Como gerente, quiero ver en todo momento la lista de productos cuyo stock esté en nivel crítico, para priorizar las solicitudes de reabastecimiento y actuar antes del desabastecimiento.
+## Historia de Usuario
 
-**Criterios de aceptación**
-- [ ] El sistema muestra únicamente los productos con stock actual menor o igual al stock mínimo
-- [ ] La lista incluye: nombre del producto, categoría, stock actual, stock mínimo y déficit (mínimo - actual)
-- [ ] Los productos se ordenan de mayor a menor urgencia (menor stock relativo al mínimo primero)
-- [ ] El badge de alertas en el menú lateral muestra en tiempo real el número de productos en estado crítico
-- [ ] El gerente puede crear una solicitud de reabastecimiento directamente desde esta vista
+Como gerente,
+quiero ver en cualquier momento qué productos tienen stock crítico,
+para saber qué hay que pedir con más urgencia.
 
-**Propiedades del Issue**
+## Criterios de Aceptación
+
+- [ ] Muestra solo los productos con stock actual igual o menor al mínimo
+- [ ] Incluye: nombre del producto, categoría, stock actual, stock mínimo y cuánto falta
+- [ ] Los productos se ordenan del más urgente al menos urgente
+- [ ] El menú lateral muestra cuántos productos están en alerta en ese momento
+- [ ] Desde esta pantalla se puede crear una solicitud de reabastecimiento directamente
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Romina (Developer) |
+| Assignee | Romina |
 | Labels | `enhancement` `frontend` `backend` |
 | Priority | P1 |
 | Size | S |
@@ -465,22 +473,10 @@ Como gerente, quiero ver en todo momento la lista de productos cuyo stock esté 
 
 ---
 
-## Resumen del backlog
+## Resumen
 
-| Sprint | HUs | Story Points | Fechas |
-|--------|-----|-------------|--------|
-| Sprint 1 | HU-01 al HU-07 | 41 pts | 2026-05-25 → 2026-06-19 |
-| Sprint 2 | HU-08 al HU-15 | 47 pts | 2026-06-20 → 2026-07-17 |
+| Sprint | HUs | Puntos | Fechas |
+|--------|-----|--------|--------|
+| Sprint 1 | HU-01 al HU-07 | 41 pts | 25/05 → 19/06 |
+| Sprint 2 | HU-08 al HU-15 | 47 pts | 20/06 → 17/07 |
 | **Total** | **15 HU** | **88 pts** | **8 semanas** |
-
----
-
-## Distribución por integrante
-
-| Integrante | Rol | HUs asignadas |
-|-----------|-----|--------------|
-| Juan | Product Owner | HU-01, HU-12 |
-| Diago Estrada | Scrum Master | HU-02, HU-03, HU-04, HU-11, HU-12 |
-| Sebastian García | Developer | HU-05, HU-06, HU-09, HU-10 |
-| Romina | Developer | HU-07, HU-08, HU-15 |
-| Fabricio Carreño | Developer | HU-13, HU-14 |
