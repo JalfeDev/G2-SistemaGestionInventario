@@ -109,12 +109,12 @@ para mantener actualizada la lista de insumos del hotel.
 | Status | Todo |
 | Assignee | Diago Estrada |
 | Labels | `enhancement` `backend` `frontend` `database` |
-| Priority | P1 |
+| Priority | P0 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 1 |
-| Start Date | 2026-05-28 |
-| Target Date | 2026-06-04 |
+| Start Date | 2026-05-27 |
+| Target Date | 2026-06-03 |
 
 ---
 
@@ -140,10 +140,10 @@ para adaptar el sistema a cómo trabaja el hotel.
 | Assignee | Diago Estrada |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
-| Size | L |
-| Estimate | 8 pts |
+| Size | M |
+| Estimate | 5 pts |
 | Iteration | Sprint 1 |
-| Start Date | 2026-05-28 |
+| Start Date | 2026-05-30 |
 | Target Date | 2026-06-05 |
 
 ---
@@ -168,7 +168,7 @@ para mantener el stock actualizado y saber cuánto costó cada compra.
 |-----------|-------|
 | Status | Todo |
 | Assignee | Sebastian García |
-| Labels | `enhancement` `backend` `database` |
+| Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P0 |
 | Size | M |
 | Estimate | 5 pts |
@@ -202,7 +202,7 @@ para saber qué productos necesitan reabastecerse pronto.
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 1 |
-| Start Date | 2026-06-01 |
+| Start Date | 2026-06-04 |
 | Target Date | 2026-06-07 |
 
 ---
@@ -257,7 +257,7 @@ para no tener que ingresar uno por uno cuando hay muchos productos.
 | Status | Todo |
 | Assignee | Romina Rebaza |
 | Labels | `enhancement` `backend` `frontend` |
-| Priority | P1 |
+| Priority | P2 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
@@ -285,12 +285,12 @@ para comparar cuánto ha costado cada insumo en distintas fechas.
 |-----------|-------|
 | Status | Todo |
 | Assignee | Sebastian García |
-| Labels | `enhancement` `backend` `database` |
+| Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-06-09 |
+| Start Date | 2026-06-12 |
 | Target Date | 2026-06-20 |
 
 ---
@@ -314,8 +314,8 @@ para poder hacer el pedido a tiempo y evitar que se acabe.
 |-----------|-------|
 | Status | Todo |
 | Assignee | Sebastian García |
-| Labels | `enhancement` `backend` |
-| Priority | P0 |
+| Labels | `enhancement` `backend` `database` |
+| Priority | P1 |
 | Size | L |
 | Estimate | 8 pts |
 | Iteration | Sprint 2 |
@@ -346,7 +346,7 @@ para que quede un registro formal de cada pedido y su estado.
 | Assignee | Diago Estrada |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
-| Size | L |
+| Size | M |
 | Estimate | 8 pts |
 | Iteration | Sprint 2 |
 | Start Date | 2026-06-22 |
@@ -405,7 +405,7 @@ para analizar cuánto se usa de cada insumo y planificar las compras.
 | Status | Todo |
 | Assignee | Fabricio Carreño |
 | Labels | `enhancement` `backend` `frontend` |
-| Priority | P0 |
+| Priority | P1 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
@@ -434,7 +434,7 @@ para saber con quién conviene seguir comprando.
 | Status | Todo |
 | Assignee | Fabricio Carreño |
 | Labels | `enhancement` `backend` `frontend` |
-| Priority | P0 |
+| Priority | P1 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
@@ -480,3 +480,13 @@ para saber qué hay que pedir con más urgencia.
 | Sprint 1 | HU-01 al HU-06 | 31 pts | 2026-05-25 → 2026-06-07 |
 | Sprint 2 | HU-07 al HU-15 | 57 pts | 2026-06-09 → 2026-07-17 |
 | **Total** | **15 HU** | **88 pts** | **8 semanas** |
+
+---
+
+## Prioridades
+
+| Nivel | Significado | HUs |
+|-------|-------------|-----|
+| P0 | Crítico — el sistema no funciona sin esto | HU-01, HU-02, HU-03, HU-05 |
+| P1 | Alta — funcionalidad importante del Release | HU-04, HU-06, HU-07, HU-09, HU-10, HU-11, HU-12, HU-13, HU-14, HU-15 |
+| P2 | Media — mejora de comodidad | HU-08 |
