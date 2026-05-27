@@ -137,7 +137,7 @@ para adaptar el sistema a cómo trabaja el hotel.
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Diago Estrada |
+| Assignee | Juan Loyola |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
