@@ -137,7 +137,7 @@ para adaptar el sistema a cómo trabaja el hotel.
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Diago Estrada |
+| Assignee | Juan Loyola |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
@@ -313,7 +313,7 @@ para poder hacer el pedido a tiempo y evitar que se acabe.
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Sebastian García |
+| Assignee | Fabricio Carreño |
 | Labels | `enhancement` `backend` `database` |
 | Priority | P1 |
 | Size | L |
