@@ -94,8 +94,11 @@ function Distribuciones() {
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', marginBottom: '6px' }}>Cantidad</label>
             <input
-              type="number" name="cantidad" value={form.cantidad}
-              onChange={handleChange} placeholder="Ej: 2" style={inputStyle}
+                type="number" name="cantidad" value={form.cantidad}
+                onChange={handleChange} placeholder="Ej: 2" 
+                step="1"
+                min="1"
+                style={inputStyle}
             />
           </div>
 
