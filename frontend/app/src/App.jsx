@@ -3,6 +3,7 @@ import Login from './pages/Login'
 import Stock from './pages/Stock'
 import Alertas from './pages/Alertas'
 import Entradas from './pages/Entradas'
+import Distribuciones from './pages/Distribuciones'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/stock" element={<Stock />} />
         <Route path="/alertas" element={<Alertas />} />
         <Route path="/entradas" element={<Entradas />} />
+        <Route path="/distribuciones" element={<Distribuciones />} />
       </Routes>
     </BrowserRouter>
   )
