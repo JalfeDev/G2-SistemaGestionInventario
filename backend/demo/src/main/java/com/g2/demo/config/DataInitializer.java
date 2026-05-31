@@ -37,24 +37,45 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (!enabled || usuarioRepository.findByUsernameOrEmail(adminUsername, adminUsername).isPresent()) {
-            return;
-        }
+ 
+    rolRepository.findByNombre("GERENTE").orElseGet(() -> {
+        Rol nuevoRol = new Rol();
+        nuevoRol.setNombre("GERENTE");
+        nuevoRol.setDescripcion("Gerente del hotel");
+        return rolRepository.save(nuevoRol);
+    });
+    rolRepository.findByNombre("ADMINISTRADOR").orElseGet(() -> {
+        Rol nuevoRol = new Rol();
+        nuevoRol.setNombre("ADMINISTRADOR");
+        nuevoRol.setDescripcion("Administrador del sistema");
+        return rolRepository.save(nuevoRol);
+    });
+    rolRepository.findByNombre("ALMACEN").orElseGet(() -> {
+        Rol nuevoRol = new Rol();
+        nuevoRol.setNombre("ALMACEN");
+        nuevoRol.setDescripcion("Encargado de almacén");
+        return rolRepository.save(nuevoRol);
+    });
+    rolRepository.findByNombre("HOUSEKEEPING").orElseGet(() -> {
+        Rol nuevoRol = new Rol();
+        nuevoRol.setNombre("HOUSEKEEPING");
+        nuevoRol.setDescripcion("Personal de housekeeping");
+        return rolRepository.save(nuevoRol);
+    });
 
-        Rol rol = rolRepository.findByNombre("GERENTE").orElseGet(() -> {
-            Rol nuevoRol = new Rol();
-            nuevoRol.setNombre("GERENTE");
-            nuevoRol.setDescripcion("Gerente del hotel");
-            return rolRepository.save(nuevoRol);
-        });
+    if (!enabled || usuarioRepository.findByUsernameOrEmail(adminUsername, adminUsername).isPresent()) {
+        return;
+    }
 
-        Usuario usuario = new Usuario();
-        usuario.setUsername(adminUsername);
-        usuario.setPassword(passwordEncoder.encode(adminPassword));
-        usuario.setNombre("Administrador");
-        usuario.setEmail("admin@hotelpiramide.local");
-        usuario.setActivo(true);
-        usuario.setRol(rol);
-        usuarioRepository.save(usuario);
+    Rol rol = rolRepository.findByNombre("GERENTE").get();
+
+    Usuario usuario = new Usuario();
+    usuario.setUsername(adminUsername);
+    usuario.setPassword(passwordEncoder.encode(adminPassword));
+    usuario.setNombre("Administrador");
+    usuario.setEmail("admin@hotelpiramide.local");
+    usuario.setActivo(true);
+    usuario.setRol(rol);
+    usuarioRepository.save(usuario);
     }
 }
