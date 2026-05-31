@@ -23,9 +23,9 @@ public class DataInitializer implements CommandLineRunner {
             RolRepository rolRepository,
             UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
-            @Value("${app.seed-admin.enabled:true}") boolean enabled,
-            @Value("${app.seed-admin.username:admin}") String adminUsername,
-            @Value("${app.seed-admin.password:admin123}") String adminPassword
+            @Value("${app.seed-admin.enabled}") boolean enabled,
+            @Value("${app.seed-admin.username}") String adminUsername,
+            @Value("${app.seed-admin.password}") String adminPassword
     ) {
         this.rolRepository = rolRepository;
         this.usuarioRepository = usuarioRepository;
@@ -41,6 +41,7 @@ public class DataInitializer implements CommandLineRunner {
             return;
         }
 
+        //Crear el ron de gerente en la tabla rol si no hay uno con el rol de GERENTE
         Rol rol = rolRepository.findByNombre("GERENTE").orElseGet(() -> {
             Rol nuevoRol = new Rol();
             nuevoRol.setNombre("GERENTE");
@@ -48,11 +49,12 @@ public class DataInitializer implements CommandLineRunner {
             return rolRepository.save(nuevoRol);
         });
 
+        //Crear un nuevo usuario en la tabla usuario si no hay uno con el rol de GERENTE
         Usuario usuario = new Usuario();
         usuario.setUsername(adminUsername);
         usuario.setPassword(passwordEncoder.encode(adminPassword));
         usuario.setNombre("Administrador");
-        usuario.setEmail("admin@hotelpiramide.local");
+        usuario.setEmail("");
         usuario.setActivo(true);
         usuario.setRol(rol);
         usuarioRepository.save(usuario);
