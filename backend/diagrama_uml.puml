@@ -39,7 +39,6 @@ entity "Productos" as productos {
     nombre : VARCHAR
     stock_actual : DECIMAL
     stock_minimo : DECIMAL
-    activo : BOOLEAN
 
     id_categoria : INT <<FK>>
     id_unidad : INT <<FK>>
@@ -48,40 +47,45 @@ entity "Productos" as productos {
 entity "Proveedores" as proveedores {
     * id_proveedor : INT <<PK>>
     --
-    razon_social : VARCHAR
-    ruc : VARCHAR
+    nombre : VARCHAR
+    ruc : INT
     telefono : VARCHAR
     correo : VARCHAR
     direccion : VARCHAR
 }
 
-entity "Proveedor_Producto" as proveedor_producto {
+' Resuelve RF-32
+entity "Proveedor_Producto" as proveedor_prod {
     * id : INT <<PK>>
     --
     id_proveedor : INT <<FK>>
     id_producto : INT <<FK>>
 }
 
+' Cabecera del ingreso
 entity "Ingresos_Inventario" as ingresos {
-    * id_ingreso : INT <<PK>>
+    * id_ingresoinv : INT <<PK>>
     --
     fecha_ingreso : DATETIME
     observacion : TEXT
     id_usuario : INT <<FK>>
 }
 
+' Cumple RF-33
 entity "Detalle_Ingreso" as detalle_ingreso {
     * id_detalle : INT <<PK>>
     --
     cantidad : DECIMAL
     costo_unitario : DECIMAL
 
-    id_ingreso : INT <<FK>>
+    id_ingresoinv : INT <<FK>>
     id_producto : INT <<FK>>
     id_proveedor : INT <<FK>>
 }
 
-entity "Movimientos_Inventario" as movimientos {
+' Kardex o historial de movimientos
+' Tipo: INGRESO, SALIDA o AJUSTE
+entity "Movimientos_Inventario" as movimientos_inv {
     * id_movimiento : INT <<PK>>
     --
     tipo_movimiento : VARCHAR
@@ -99,9 +103,9 @@ entity "Habitaciones" as habitaciones {
     --
     numero : VARCHAR
     piso : INT
-    estado : VARCHAR
 }
 
+' Historial de uso de habitaciones
 entity "Distribucion_Insumos" as distribucion {
     * id_distribucion : INT <<PK>>
     --
@@ -111,8 +115,9 @@ entity "Distribucion_Insumos" as distribucion {
     id_usuario : INT <<FK>>
 }
 
+' Cumple RF-16
 entity "Detalle_Distribucion" as detalle_distribucion {
-    * id_detalle : INT <<PK>>
+    * id_detalledistr : INT <<PK>>
     --
     cantidad : DECIMAL
 
@@ -120,6 +125,9 @@ entity "Detalle_Distribucion" as detalle_distribucion {
     id_producto : INT <<FK>>
 }
 
+' Cumple RF-23, RF-24 y RF-25
+' estado: PENDIENTE, APROBADO, RECHAZADO
+' solicitante es user Encargado, aprobador es user Gerente
 entity "Solicitudes_Compra" as solicitudes {
     * id_solicitud : INT <<PK>>
     --
@@ -133,7 +141,7 @@ entity "Solicitudes_Compra" as solicitudes {
 }
 
 entity "Detalle_Solicitud" as detalle_solicitud {
-    * id_detalle : INT <<PK>>
+    * id_detallesol : INT <<PK>>
     --
     cantidad_solicitada : DECIMAL
 
@@ -147,18 +155,6 @@ entity "Notificaciones" as notificaciones {
     mensaje : TEXT
     fecha : DATETIME
     leido : BOOLEAN
-
-    id_usuario : INT <<FK>>
-}
-
-entity "Auditoria" as auditoria {
-    * id_auditoria : INT <<PK>>
-    --
-    accion : VARCHAR
-    tabla_afectada : VARCHAR
-    registro_id : INT
-    fecha_hora : DATETIME
-    detalle : TEXT
 
     id_usuario : INT <<FK>>
 }
@@ -178,11 +174,11 @@ ingresos --> detalle_ingreso : 1...N
 productos --> detalle_ingreso : 1...N
 proveedores --> detalle_ingreso : 1...N
 
-proveedores --> proveedor_producto : 1...N
-productos --> proveedor_producto : 1...N
+proveedores --> proveedor_prod : 1...N
+productos --> proveedor_prod : 1...N
 
-productos --> movimientos : 1...N
-usuarios --> movimientos : 1...N
+productos --> movimientos_inv : 1...N
+usuarios --> movimientos_inv : 1...N
 
 habitaciones --> distribucion : 1...N
 usuarios --> distribucion : 1...N
@@ -190,13 +186,12 @@ usuarios --> distribucion : 1...N
 distribucion --> detalle_distribucion : 1...N
 productos --> detalle_distribucion : 1...N
 
-usuarios --> solicitudes : crea : 1...N
-usuarios --> solicitudes : aprueba : 1...N
+usuarios --> solicitudes : crea:1...N
+usuarios --> solicitudes : aprueba:1...N
 
 solicitudes --> detalle_solicitud : 1...N
 productos --> detalle_solicitud : 1...N
 
 usuarios --> notificaciones : 1...N
-usuarios --> auditoria : 1...N
 
 @enduml
