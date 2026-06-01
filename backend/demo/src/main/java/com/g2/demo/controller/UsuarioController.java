@@ -35,6 +35,11 @@ public class UsuarioController {
         return usuarioService.crear(request);
     }
 
+    @PutMapping("/{id}")
+    public UsuarioResponse actualizar(@PathVariable Long id, @RequestBody UsuarioRequest request) {
+        return usuarioService.actualizar(id, request);
+    }
+
     @PatchMapping("/{id}/rol")
     public UsuarioResponse cambiarRol(@PathVariable Long id, @RequestBody Map<String, Long> body) {
         Long rolId = body.get("rolId");
