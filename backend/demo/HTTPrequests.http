@@ -1,0 +1,255 @@
+### GET request to example server
+###
+GET http://localhost:8080/api/categorias
+
+###
+POST http://localhost:8080/api/auth/login
+
+###
+GET http://localhost:8080/api/auth/me
+
+###
+GET http://localhost:8080/api/proveedores
+
+###
+POST http://localhost:8080/api/proveedores
+
+###
+GET http://localhost:8080/api/proveedores/{{id}}
+
+###
+PUT http://localhost:8080/api/proveedores/{{id}}
+
+###
+DELETE http://localhost:8080/api/proveedores/{{id}}
+
+###
+GET http://localhost:8080/api/usuarios
+
+###
+POST http://localhost:8080/api/usuarios
+
+###
+GET http://localhost:8080/api/usuarios/{{id}}
+
+###
+PUT http://localhost:8080/api/usuarios/{{id}}
+
+###
+DELETE http://localhost:8080/api/usuarios/{{id}}
+
+###
+PATCH http://localhost:8080/api/usuarios/{{id}}/rol
+
+###
+GET http://localhost:8080/api/categorias
+
+###
+POST http://localhost:8080/api/categorias
+
+###
+GET http://localhost:8080/api/categorias/{{id}}
+
+###
+PUT http://localhost:8080/api/categorias/{{id}}
+
+###
+DELETE http://localhost:8080/api/categorias/{{id}}
+
+###
+GET http://localhost:8080/api/unidades-medida
+
+###
+POST http://localhost:8080/api/unidades-medida
+
+###
+GET http://localhost:8080/api/unidades-medida/{{id}}
+
+###
+PUT http://localhost:8080/api/unidades-medida/{{id}}
+
+###
+DELETE http://localhost:8080/api/unidades-medida/{{id}}
+
+###
+GET http://localhost:8080/api/detalles-distribucion
+
+###
+POST http://localhost:8080/api/detalles-distribucion
+
+###
+GET http://localhost:8080/api/detalles-distribucion/{{id}}
+
+###
+PUT http://localhost:8080/api/detalles-distribucion/{{id}}
+
+###
+DELETE http://localhost:8080/api/detalles-distribucion/{{id}}
+
+###
+GET http://localhost:8080/api/detalles-ingreso
+
+###
+POST http://localhost:8080/api/detalles-ingreso
+
+###
+GET http://localhost:8080/api/detalles-ingreso/{{id}}
+
+###
+PUT http://localhost:8080/api/detalles-ingreso/{{id}}
+
+###
+DELETE http://localhost:8080/api/detalles-ingreso/{{id}}
+
+###
+GET http://localhost:8080/api/detalles-solicitud
+
+###
+POST http://localhost:8080/api/detalles-solicitud
+
+###
+GET http://localhost:8080/api/detalles-solicitud/{{id}}
+
+###
+PUT http://localhost:8080/api/detalles-solicitud/{{id}}
+
+###
+DELETE http://localhost:8080/api/detalles-solicitud/{{id}}
+
+###
+GET http://localhost:8080/api/distribuciones-insumos
+
+###
+POST http://localhost:8080/api/distribuciones-insumos
+
+###
+GET http://localhost:8080/api/distribuciones-insumos/{{id}}
+
+###
+PUT http://localhost:8080/api/distribuciones-insumos/{{id}}
+
+###
+DELETE http://localhost:8080/api/distribuciones-insumos/{{id}}
+
+###
+GET http://localhost:8080/api/habitaciones
+
+###
+POST http://localhost:8080/api/habitaciones
+
+###
+GET http://localhost:8080/api/habitaciones/{{id}}
+
+###
+PUT http://localhost:8080/api/habitaciones/{{id}}
+
+###
+DELETE http://localhost:8080/api/habitaciones/{{id}}
+
+###
+GET http://localhost:8080/api/ingresos-inventario
+
+###
+POST http://localhost:8080/api/ingresos-inventario
+
+###
+GET http://localhost:8080/api/ingresos-inventario/{{id}}
+
+###
+PUT http://localhost:8080/api/ingresos-inventario/{{id}}
+
+###
+DELETE http://localhost:8080/api/ingresos-inventario/{{id}}
+
+###
+GET http://localhost:8080/api/movimientos-inventario
+
+###
+POST http://localhost:8080/api/movimientos-inventario
+
+###
+GET http://localhost:8080/api/movimientos-inventario/{{id}}
+
+###
+PUT http://localhost:8080/api/movimientos-inventario/{{id}}
+
+###
+DELETE http://localhost:8080/api/movimientos-inventario/{{id}}
+
+###
+GET http://localhost:8080/api/notificaciones
+
+###
+POST http://localhost:8080/api/notificaciones
+
+###
+GET http://localhost:8080/api/notificaciones/{{id}}
+
+###
+PUT http://localhost:8080/api/notificaciones/{{id}}
+
+###
+DELETE http://localhost:8080/api/notificaciones/{{id}}
+
+###
+GET http://localhost:8080/api/productos
+
+###
+POST http://localhost:8080/api/productos
+
+###
+GET http://localhost:8080/api/productos/alertas
+
+###
+GET http://localhost:8080/api/productos/{{id}}
+
+###
+PUT http://localhost:8080/api/productos/{{id}}
+
+###
+DELETE http://localhost:8080/api/productos/{{id}}
+
+###
+GET http://localhost:8080/api/proveedor-producto
+
+###
+POST http://localhost:8080/api/proveedor-producto
+
+###
+GET http://localhost:8080/api/proveedor-producto/{{id}}
+
+###
+PUT http://localhost:8080/api/proveedor-producto/{{id}}
+
+###
+DELETE http://localhost:8080/api/proveedor-producto/{{id}}
+
+###
+GET http://localhost:8080/api/roles
+
+###
+POST http://localhost:8080/api/roles
+
+###
+GET http://localhost:8080/api/roles/{{id}}
+
+###
+PUT http://localhost:8080/api/roles/{{id}}
+
+###
+DELETE http://localhost:8080/api/roles/{{id}}
+
+###
+GET http://localhost:8080/api/solicitudes-compra
+
+###
+POST http://localhost:8080/api/solicitudes-compra
+
+###
+GET http://localhost:8080/api/solicitudes-compra/{{id}}
+
+###
+PUT http://localhost:8080/api/solicitudes-compra/{{id}}
+
+###
+DELETE http://localhost:8080/api/solicitudes-compra/{{id}}
