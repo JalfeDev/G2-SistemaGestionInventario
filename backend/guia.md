@@ -1,31 +1,11 @@
 # Getting Started
 
-## Reference Documentation
-For further reference, please consider the following sections:
-
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/4.0.6/maven-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/4.0.6/maven-plugin/build-image.html)
-* [Spring Web](https://docs.spring.io/spring-boot/4.0.6/reference/web/servlet.html)
-* [Spring Security](https://docs.spring.io/spring-boot/4.0.6/reference/web/spring-security.html)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/4.0.6/reference/data/sql.html#data.sql.jpa-and-spring-data)
-* [Spring for Apache Kafka](https://docs.spring.io/spring-boot/4.0.6/reference/messaging/kafka.html)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/4.0.6/reference/using/devtools.html)
-* [Validation](https://docs.spring.io/spring-boot/4.0.6/reference/io/validation.html)
-* [Java Mail Sender](https://docs.spring.io/spring-boot/4.0.6/reference/io/email.html)
-
 ## Guides
 The following guides illustrate how to use some features concretely:
-
+* [Create an OCI image](https://docs.spring.io/spring-boot/4.0.6/maven-plugin/build-image.html)
 * [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
 * [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
 * [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Securing a Web Application](https://spring.io/guides/gs/securing-web/)
-* [Spring Boot and OAuth2](https://spring.io/guides/tutorials/spring-boot-oauth2/)
-* [Authenticating a User with LDAP](https://spring.io/guides/gs/authenticating-ldap/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-* [Accessing data with MySQL](https://spring.io/guides/gs/accessing-data-mysql/)
-* [Validation](https://spring.io/guides/gs/validating-form-input/)
 
 ## Dependencias del proyecto
 1. Spring Data JPA
@@ -67,69 +47,13 @@ main
 │   └───com
 │       └───g2
 │           └───demo
-│               │   DemoApplication.java
-│               │
 │               ├───config
-│               │       DataInitializer.java
-│               │       JwtFilter.java
-│               │       JwtUtil.java
-│               │       SecurityConfig.java
-│               │
 │               ├───controller
-│               │       AuthController.java
-│               │       CategoriaController.java
-│               │       ProveedorController.java
-│               │       UsuarioController.java
-│               │
 │               ├───dto
-│               │       LoginRequest.java
-│               │       LoginResponse.java
-│               │       ProductoRequest.java
-│               │       UsuarioRequest.java
-│               │       UsuarioResponse.java
-│               │
 │               ├───entity
-│               │       Categoria.java
-│               │       Distribucion.java
-│               │       Habitacion.java
-│               │       MovimientoInventario.java
-│               │       Producto.java
-│               │       Proveedor.java
-│               │       Rol.java
-│               │       Usuario.java
-│               │
 │               ├───repository
-│               │       CategoriaRepository.java
-│               │       DistribucionRepository.java
-│               │       HabitacionRepository.java
-│               │       MovimientoInventarioRepository.java
-│               │       ProductoRepository.java
-│               │       ProveedorRepository.java
-│               │       RolRepository.java
-│               │       UsuarioRepository.java
-│               │
 │               └───service
-│                       AuthService.java
-│                       CategoriaService.java
-│                       ProductoService.java
-│                       ProveedorService.java
-│                       UsuarioService.java
 ```
-
-## Los @
-
-### @Value
-
-### @Component
-
-### @Entity
-
-### @Controller
-
-### @Service
-
-### @Repository
-
 
 ## Los Requisitos funcionales
 # Sistema de Gestión de Inventario - Hotel Pirámide
