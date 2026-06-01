@@ -1,150 +1,47 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { Badge, Card, Empty, Field, Icon, Loader, Notice, PageHeader, ResourceNotice, SearchBox } from '../components/ui'
+import { fallbackCategorias, fallbackProductos, fallbackUnidades } from '../data/fallbackData'
+import { useApiResource } from '../hooks/useApiResource'
+import { categoriaService, getApiError, productoService, unidadService } from '../services/api'
 
-const productosMock = [
-  { id: 1, nombre: 'Shampoo', categoria: 'Limpieza', stockActual: 5, stockMinimo: 10 },
-  { id: 2, nombre: 'Jabón de manos', categoria: 'Limpieza', stockActual: 20, stockMinimo: 15 },
-  { id: 3, nombre: 'Papel higiénico', categoria: 'Higiene', stockActual: 3, stockMinimo: 20 },
-  { id: 4, nombre: 'Desinfectante', categoria: 'Limpieza', stockActual: 8, stockMinimo: 5 },
-  { id: 5, nombre: 'Toallas', categoria: 'Habitación', stockActual: 2, stockMinimo: 10 },
-]
+const initialForm = { nombre: '', stockActual: '0', stockMinimo: '', categoriaId: '', unidadId: '' }
 
-const categoriasMock = ['Limpieza', 'Higiene', 'Habitación', 'Mantenimiento']
-
-function Productos() {
-  const [productos, setProductos] = useState(productosMock)
-  const [mostrarForm, setMostrarForm] = useState(false)
-  const [form, setForm] = useState({ nombre: '', categoria: '', stockMinimo: '' })
+export default function Productos() {
+  const products = useApiResource(productoService.listar, fallbackProductos)
+  const categories = useApiResource(categoriaService.listar, fallbackCategorias)
+  const units = useApiResource(unidadService.listar, fallbackUnidades)
+  const [query, setQuery] = useState('')
+  const [form, setForm] = useState(initialForm)
+  const [open, setOpen] = useState(false)
+  const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const filtered = useMemo(() => products.data.filter((item) => item.nombre.toLowerCase().includes(query.toLowerCase())), [products.data, query])
 
-  const inputStyle = {
-    width: '100%', padding: '10px', borderRadius: '4px',
-    border: '1px solid #ccc', boxSizing: 'border-box', fontSize: '14px'
-  }
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    setError('')
-  }
-
-  const handleCrear = (e) => {
-    e.preventDefault()
-    if (!form.nombre || !form.categoria || !form.stockMinimo) {
-      setError('Completa todos los campos')
-      return
+  async function create(event) {
+    event.preventDefault()
+    if (!form.nombre || !form.stockMinimo || !form.categoriaId || !form.unidadId) return setError('Completa los campos obligatorios.')
+    try {
+      const { data } = await productoService.crear({ ...form, stockActual: Number(form.stockActual), stockMinimo: Number(form.stockMinimo), categoriaId: Number(form.categoriaId), unidadId: Number(form.unidadId) })
+      products.setData([data, ...products.data])
+      setForm(initialForm)
+      setOpen(false)
+      setMessage('Producto registrado correctamente.')
+      setError('')
+    } catch (requestError) {
+      setError(getApiError(requestError))
     }
-    const duplicado = productos.find(
-      p => p.nombre.toLowerCase() === form.nombre.toLowerCase() &&
-           p.categoria === form.categoria
-    )
-    if (duplicado) {
-      setError('Ya existe un producto con ese nombre en esa categoría')
-      return
-    }
-    const nuevo = {
-      id: productos.length + 1,
-      nombre: form.nombre,
-      categoria: form.categoria,
-      stockActual: 0,
-      stockMinimo: parseInt(form.stockMinimo)
-    }
-    setProductos([...productos, nuevo])
-    setMensaje(`✓ Producto "${form.nombre}" registrado correctamente`)
-    setForm({ nombre: '', categoria: '', stockMinimo: '' })
-    setMostrarForm(false)
-  }
-
-  const handleEliminar = (id) => {
-    setProductos(productos.filter(p => p.id !== id))
-    setMensaje('✓ Producto eliminado')
   }
 
   return (
-    <div style={{ padding: '24px', fontFamily: 'Arial' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h2 style={{ color: '#1F3864', margin: 0 }}>Gestión de Productos</h2>
-        <button
-          onClick={() => { setMostrarForm(!mostrarForm); setError(''); setMensaje('') }}
-          style={{
-            padding: '10px 20px', backgroundColor: '#1F3864',
-            color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'
-          }}
-        >
-          {mostrarForm ? 'Cancelar' : '+ Nuevo producto'}
-        </button>
-      </div>
-
-      {mensaje && <p style={{ color: '#2e7d32', marginBottom: '12px' }}>{mensaje}</p>}
-
-      {mostrarForm && (
-        <div style={{ backgroundColor: '#f0f4f8', padding: '20px', borderRadius: '8px', marginBottom: '24px', maxWidth: '500px' }}>
-          <h3 style={{ marginTop: 0, color: '#1F3864' }}>Nuevo producto</h3>
-          <form onSubmit={handleCrear}>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', marginBottom: '6px' }}>Nombre</label>
-              <input name="nombre" value={form.nombre} onChange={handleChange}
-                placeholder="Ej: Shampoo" style={inputStyle} />
-            </div>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', marginBottom: '6px' }}>Categoría</label>
-              <select name="categoria" value={form.categoria} onChange={handleChange} style={inputStyle}>
-                <option value="">Selecciona una categoría</option>
-                {categoriasMock.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', marginBottom: '6px' }}>Stock mínimo</label>
-              <input name="stockMinimo" type="number" min="0" value={form.stockMinimo}
-                onChange={handleChange} placeholder="Ej: 10" style={inputStyle} />
-            </div>
-            {error && <p style={{ color: '#cc0000', marginBottom: '12px' }}>⚠ {error}</p>}
-            <button type="submit" style={{
-              padding: '10px 20px', backgroundColor: '#2e7d32',
-              color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'
-            }}>
-              Guardar producto
-            </button>
-          </form>
-        </div>
-      )}
-
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#1F3864', color: 'white' }}>
-            <th style={{ padding: '10px', textAlign: 'left' }}>Nombre</th>
-            <th style={{ padding: '10px', textAlign: 'left' }}>Categoría</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Stock actual</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Stock mínimo</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos.map((p, i) => (
-            <tr key={p.id} style={{
-              backgroundColor: i % 2 === 0 ? '#f9f9f9' : 'white',
-              borderBottom: '1px solid #ddd'
-            }}>
-              <td style={{ padding: '10px' }}>{p.nombre}</td>
-              <td style={{ padding: '10px' }}>{p.categoria}</td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>{p.stockActual}</td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>{p.stockMinimo}</td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>
-                <button
-                  onClick={() => handleEliminar(p.id)}
-                  style={{
-                    padding: '6px 12px', backgroundColor: '#cc0000',
-                    color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'
-                  }}
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <PageHeader title="Productos" description="Catalogo maestro de insumos y niveles de stock." actions={<button className="button primary" onClick={() => setOpen(!open)}><Icon name="plus" size={17} /> Nuevo producto</button>} />
+      <ResourceNotice error={products.error} />
+      {message && <Notice tone="success">{message}</Notice>}
+      {open && <Card className="form-card"><div className="card-title"><div><span>Catalogo</span><h3>Registrar producto</h3></div></div><form className="form-grid" onSubmit={create}><Field label="Nombre del producto"><input value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} placeholder="Ej. Shampoo hotelero" /></Field><Field label="Categoria"><select value={form.categoriaId} onChange={(e) => setForm({ ...form, categoriaId: e.target.value })}><option value="">Seleccionar</option>{categories.data.map((item) => <option value={item.id} key={item.id}>{item.nombre}</option>)}</select></Field><Field label="Unidad de medida"><select value={form.unidadId} onChange={(e) => setForm({ ...form, unidadId: e.target.value })}><option value="">Seleccionar</option>{units.data.map((item) => <option value={item.id} key={item.id}>{item.nombre}</option>)}</select></Field><Field label="Stock minimo"><input type="number" min="0" value={form.stockMinimo} onChange={(e) => setForm({ ...form, stockMinimo: e.target.value })} /></Field>{error && <div className="form-full"><Notice tone="danger">{error}</Notice></div>}<div className="form-actions form-full"><button className="button primary">Guardar producto</button><button type="button" className="button subtle" onClick={() => setOpen(false)}>Cancelar</button></div></form></Card>}
+      <Card>
+        <div className="toolbar"><SearchBox value={query} onChange={setQuery} placeholder="Buscar por nombre..." /><button className="button subtle" onClick={products.reload}><Icon name="refresh" size={16} /> Actualizar</button></div>
+        {products.loading ? <Loader /> : filtered.length === 0 ? <Empty /> : <div className="table-wrap"><table><thead><tr><th>Producto</th><th>Categoria</th><th>Unidad</th><th>Stock actual</th><th>Stock minimo</th><th>Estado</th></tr></thead><tbody>{filtered.map((item) => { const critical = Number(item.stockActual) <= Number(item.stockMinimo); return <tr key={item.id}><td><strong>{item.nombre}</strong></td><td>{item.categoria?.nombre || '-'}</td><td>{item.unidad?.abreviatura || item.unidad?.nombre || '-'}</td><td>{item.stockActual}</td><td>{item.stockMinimo}</td><td><Badge tone={critical ? 'danger' : 'success'}>{critical ? 'Stock bajo' : 'Disponible'}</Badge></td></tr> })}</tbody></table></div>}
+      </Card>
+    </>
   )
 }
-
-export default Productos
