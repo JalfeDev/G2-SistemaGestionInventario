@@ -1,146 +1,43 @@
 import { useState } from 'react'
+import { Badge, Card, Field, Loader, Notice, PageHeader, ResourceNotice } from '../components/ui'
+import { fallbackDetallesDistribucion, fallbackHabitaciones, fallbackProductos } from '../data/fallbackData'
+import { useApiResource } from '../hooks/useApiResource'
+import { authService, detalleDistribucionService, distribucionService, getApiError, habitacionService, productoService } from '../services/api'
+import { formatDate } from '../utils/formatters'
 
-const productosMock = [
-  { id: 1, nombre: 'Shampoo', stockActual: 5 },
-  { id: 2, nombre: 'Jabón de manos', stockActual: 20 },
-  { id: 3, nombre: 'Papel higiénico', stockActual: 3 },
-  { id: 4, nombre: 'Desinfectante', stockActual: 8 },
-  { id: 5, nombre: 'Toallas', stockActual: 2 },
-]
-
-const habitacionesMock = [
-  { id: 1, numero: '101' }, { id: 2, numero: '102' },
-  { id: 3, numero: '201' }, { id: 4, numero: '202' },
-  { id: 5, numero: '301' },
-]
-
-const historialMock = [
-  { id: 1, producto: 'Shampoo', habitacion: '101', cantidad: 2, fecha: '2026-05-30' },
-  { id: 2, producto: 'Toallas', habitacion: '202', cantidad: 3, fecha: '2026-05-29' },
-]
-
-function Distribuciones() {
+export default function Distribuciones() {
+  const products = useApiResource(productoService.listar, fallbackProductos)
+  const rooms = useApiResource(habitacionService.listar, fallbackHabitaciones)
+  const details = useApiResource(detalleDistribucionService.listar, fallbackDetallesDistribucion)
   const [form, setForm] = useState({ productoId: '', habitacionId: '', cantidad: '' })
-  const [historial, setHistorial] = useState(historialMock)
-  const [mensaje, setMensaje] = useState('')
-  const [error, setError] = useState('')
+  const [status, setStatus] = useState({ tone: '', text: '' })
 
-  const inputStyle = {
-    width: '100%', padding: '10px', borderRadius: '4px',
-    border: '1px solid #ccc', boxSizing: 'border-box', fontSize: '14px'
-  }
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    setMensaje('')
-    setError('')
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!form.productoId || !form.habitacionId || !form.cantidad) {
-      setError('Completa todos los campos')
-      return
+  async function submit(event) {
+    event.preventDefault()
+    if (!form.productoId || !form.habitacionId || !form.cantidad) return setStatus({ tone: 'danger', text: 'Completa los campos obligatorios.' })
+    const product = products.data.find((item) => item.id === Number(form.productoId))
+    if (Number(form.cantidad) > Number(product?.stockActual || 0)) return setStatus({ tone: 'danger', text: `Stock insuficiente. Disponible: ${product?.stockActual || 0}.` })
+    if (localStorage.getItem('hotel_demo')) return setStatus({ tone: 'warning', text: 'Vista demo: la distribucion fue validada localmente. Inicia sesion para registrarla.' })
+    try {
+      const me = (await authService.me()).data
+      const distribution = (await distribucionService.crear({ habitacion: { id: Number(form.habitacionId) }, usuario: { id: me.id } })).data
+      const detail = (await detalleDistribucionService.crear({ cantidad: Number(form.cantidad), distribucion: { id: distribution.id }, producto: { id: Number(form.productoId) } })).data
+      details.setData([detail, ...details.data])
+      setForm({ productoId: '', habitacionId: '', cantidad: '' })
+      setStatus({ tone: 'success', text: 'Distribucion registrada correctamente.' })
+    } catch (error) {
+      setStatus({ tone: 'danger', text: getApiError(error) })
     }
-    const cantidad = parseInt(form.cantidad)
-    if (cantidad <= 0) {
-      setError('La cantidad debe ser mayor a cero')
-      return
-    }
-    const producto = productosMock.find(p => p.id === parseInt(form.productoId))
-    if (cantidad > producto.stockActual) {
-      setError(`Stock insuficiente. Disponible: ${producto.stockActual}`)
-      return
-    }
-    const habitacion = habitacionesMock.find(h => h.id === parseInt(form.habitacionId))
-    const nuevaDistribucion = {
-      id: historial.length + 1,
-      producto: producto.nombre,
-      habitacion: habitacion.numero,
-      cantidad,
-      fecha: new Date().toISOString().split('T')[0]
-    }
-    setHistorial([nuevaDistribucion, ...historial])
-    setMensaje(`✓ Distribución registrada. Stock de ${producto.nombre} actualizado.`)
-    setForm({ productoId: '', habitacionId: '', cantidad: '' })
   }
 
   return (
-    <div style={{ padding: '24px', fontFamily: 'Arial' }}>
-      <h2 style={{ color: '#1F3864' }}>Registro de Distribución — Housekeeping</h2>
-
-      <div style={{ maxWidth: '600px', marginBottom: '32px' }}>
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px' }}>Producto</label>
-            <select name="productoId" value={form.productoId} onChange={handleChange} style={inputStyle}>
-              <option value="">Selecciona un producto</option>
-              {productosMock.map(p => (
-                <option key={p.id} value={p.id}>{p.nombre} (Stock: {p.stockActual})</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px' }}>Habitación</label>
-            <select name="habitacionId" value={form.habitacionId} onChange={handleChange} style={inputStyle}>
-              <option value="">Selecciona una habitación</option>
-              {habitacionesMock.map(h => (
-                <option key={h.id} value={h.id}>Habitación {h.numero}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px' }}>Cantidad</label>
-            <input
-                type="number" name="cantidad" value={form.cantidad}
-                onChange={handleChange} placeholder="Ej: 2" 
-                step="1"
-                min="1"
-                style={inputStyle}
-            />
-          </div>
-
-          {error && <p style={{ color: '#cc0000', marginBottom: '12px' }}>⚠ {error}</p>}
-          {mensaje && <p style={{ color: '#2e7d32', marginBottom: '12px' }}>{mensaje}</p>}
-
-          <button type="submit" style={{
-            padding: '12px 24px', backgroundColor: '#1F3864',
-            color: 'white', border: 'none', borderRadius: '4px',
-            fontSize: '16px', cursor: 'pointer'
-          }}>
-            Registrar distribución
-          </button>
-        </form>
+    <>
+      <PageHeader eyebrow="Housekeeping" title="Distribucion de insumos" description="Entrega controlada de productos para habitaciones y operacion diaria." />
+      <ResourceNotice error={products.error || rooms.error || details.error} />
+      <div className="split-grid">
+        <Card className="form-card sticky-card"><div className="card-title"><div><span>Nueva entrega</span><h3>Asignar insumos</h3></div></div><form className="stack-form" onSubmit={submit}><Field label="Habitacion"><select value={form.habitacionId} onChange={(e) => setForm({ ...form, habitacionId: e.target.value })}><option value="">Seleccionar habitacion</option>{rooms.data.map((item) => <option value={item.id} key={item.id}>Habitacion {item.numero} - Piso {item.piso}</option>)}</select></Field><Field label="Producto"><select value={form.productoId} onChange={(e) => setForm({ ...form, productoId: e.target.value })}><option value="">Seleccionar producto</option>{products.data.map((item) => <option value={item.id} key={item.id}>{item.nombre} ({item.stockActual} disponibles)</option>)}</select></Field><Field label="Cantidad"><input type="number" min="0.01" step="0.01" value={form.cantidad} onChange={(e) => setForm({ ...form, cantidad: e.target.value })} /></Field>{status.text && <Notice tone={status.tone}>{status.text}</Notice>}<button className="button primary wide">Confirmar distribucion</button></form></Card>
+        <Card><div className="card-title"><div><span>Housekeeping</span><h3>Historial reciente</h3></div><Badge tone="success">En linea</Badge></div>{details.loading ? <Loader /> : <div className="compact-list">{details.data.slice(0, 8).map((item) => <div className="compact-row" key={item.id}><div><strong>{item.producto?.nombre || 'Producto'}</strong><span>Habitacion {item.distribucion?.habitacion?.numero || '-'} - {formatDate(item.distribucion?.fecha)}</span></div><strong>{item.cantidad} und</strong></div>)}</div>}</Card>
       </div>
-
-      <h3 style={{ color: '#1F3864' }}>Historial de distribuciones</h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#1F3864', color: 'white' }}>
-            <th style={{ padding: '10px', textAlign: 'left' }}>Producto</th>
-            <th style={{ padding: '10px', textAlign: 'left' }}>Habitación</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Cantidad</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Fecha</th>
-          </tr>
-        </thead>
-        <tbody>
-          {historial.map((h, i) => (
-            <tr key={h.id} style={{
-              backgroundColor: i % 2 === 0 ? '#f9f9f9' : 'white',
-              borderBottom: '1px solid #ddd'
-            }}>
-              <td style={{ padding: '10px' }}>{h.producto}</td>
-              <td style={{ padding: '10px' }}>Hab. {h.habitacion}</td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>{h.cantidad}</td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>{h.fecha}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    </>
   )
 }
-
-export default Distribuciones

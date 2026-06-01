@@ -1,75 +1,68 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_URL, authService, getApiError } from '../services/api'
+import { Icon } from '../components/ui'
 
-function Login() {
-  const [usuario, setUsuario] = useState('')
-  const [contrasena, setContrasena] = useState('')
+export default function Login() {
+  const [form, setForm] = useState({ usuario: '', contrasena: '' })
   const [error, setError] = useState('')
-
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogin = (e) => {
-    e.preventDefault()
-    if (!usuario || !contrasena) {
-      setError('Ingresa tu usuario y contraseña')
-      return
-    }
-    if (usuario === 'admin' && contrasena === '123') {
-      navigate('/stock')
-    } else {
-      setError('Usuario o contraseña incorrectos')
+  async function submit(event) {
+    event.preventDefault()
+    if (!form.usuario || !form.contrasena) return setError('Ingresa tu usuario y contrasena.')
+    setLoading(true)
+    setError('')
+    try {
+      const { data } = await authService.login(form.usuario, form.contrasena)
+      localStorage.setItem('hotel_token', data.token)
+      localStorage.setItem('hotel_user', JSON.stringify({ nombre: data.nombre, rol: data.rol }))
+      localStorage.removeItem('hotel_demo')
+      navigate('/dashboard')
+    } catch (requestError) {
+      setError(getApiError(requestError, 'Credenciales incorrectas. Revisa los datos e intenta nuevamente.'))
+    } finally {
+      setLoading(false)
     }
   }
 
+  function enterDemo() {
+    localStorage.removeItem('hotel_token')
+    localStorage.setItem('hotel_demo', 'true')
+    localStorage.setItem('hotel_user', JSON.stringify({ nombre: 'Demo visual', rol: 'Sin backend' }))
+    navigate('/dashboard')
+  }
+
   return (
-    <div style={{
-      display: 'flex', justifyContent: 'center', alignItems: 'center',
-      height: '100vh', backgroundColor: '#f0f2f5', fontFamily: 'Arial'
-    }}>
-      <div style={{
-        backgroundColor: 'white', padding: '40px', borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)', width: '360px'
-      }}>
-        <h2 style={{ textAlign: 'center', color: '#1F3864', marginBottom: '8px' }}>
-          Hotel Pirámide
-        </h2>
-        <p style={{ textAlign: 'center', color: '#666', marginBottom: '24px' }}>
-          Sistema de Gestión de Inventario
-        </p>
-        <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px' }}>Usuario</label>
-            <input
-              type="text"
-              value={usuario}
-              onChange={e => setUsuario(e.target.value)}
-              placeholder="Ingresa tu usuario"
-              style={{ width: '100%', padding: '10px', borderRadius: '4px',
-                border: '1px solid #ccc', boxSizing: 'border-box' }}
-            />
-          </div>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px' }}>Contraseña</label>
-            <input
-              type="password"
-              value={contrasena}
-              onChange={e => setContrasena(e.target.value)}
-              placeholder="Ingresa tu contraseña"
-              style={{ width: '100%', padding: '10px', borderRadius: '4px',
-                border: '1px solid #ccc', boxSizing: 'border-box' }}
-            />
-          </div>
-          {error && <p style={{ color: '#cc0000', marginBottom: '12px' }}>⚠ {error}</p>}
-          <button type="submit" style={{
-            width: '100%', padding: '12px', backgroundColor: '#1F3864',
-            color: 'white', border: 'none', borderRadius: '4px', fontSize: '16px', cursor: 'pointer'
-          }}>
-            Iniciar sesión
-          </button>
+    <div className="login-page">
+      <div className="login-visual">
+        <div className="login-brand"><span>HP</span> Hotel Piramide</div>
+        <div className="login-copy">
+          <p className="eyebrow light">Gestion hotelera inteligente</p>
+          <h1>Control preciso para una operacion impecable.</h1>
+          <p>Administra insumos, housekeeping y abastecimiento desde un solo lugar.</p>
+        </div>
+        <div className="login-stats">
+          <div><strong>360</strong><span>Vision integral</span></div>
+          <div><strong>24/7</strong><span>Operacion continua</span></div>
+          <div><strong>1</strong><span>Panel central</span></div>
+        </div>
+      </div>
+      <div className="login-panel">
+        <form className="login-form" onSubmit={submit}>
+          <div className="login-mobile-brand"><span>HP</span> Hotel Piramide</div>
+          <p className="eyebrow">Bienvenido</p>
+          <h2>Inicia sesion</h2>
+          <p className="muted">Accede al sistema de inventario del hotel.</p>
+          <label className="field"><span>Usuario</span><input value={form.usuario} onChange={(event) => setForm({ ...form, usuario: event.target.value })} placeholder="Ingresa tu usuario" autoComplete="username" /></label>
+          <label className="field"><span>Contrasena</span><input type="password" value={form.contrasena} onChange={(event) => setForm({ ...form, contrasena: event.target.value })} placeholder="Ingresa tu contrasena" autoComplete="current-password" /></label>
+          {error && <div className="notice notice-danger">{error}</div>}
+          <button className="button primary wide" disabled={loading}>{loading ? 'Validando acceso...' : 'Ingresar al sistema'}</button>
+          <button className="button subtle wide" type="button" onClick={enterDemo}>Explorar demo visual</button>
+          <p className="login-endpoint"><Icon name="check" size={15} /> Conexion configurada: {API_URL}</p>
         </form>
       </div>
     </div>
   )
 }
-
-export default Login
