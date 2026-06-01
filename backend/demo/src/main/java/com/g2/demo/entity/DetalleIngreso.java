@@ -13,39 +13,33 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "movimientos_inventario")
-public class MovimientoInventario {
+@Table(name = "detalle_ingreso")
+public class DetalleIngreso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_movimiento")
+    @Column(name = "id_detalle")
     private Long id;
-
-    @Column(name = "tipo_movimiento", nullable = false, length = 30)
-    private String tipoMovimiento;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal cantidad;
 
-    @Column(name = "stock_anterior", nullable = false, precision = 10, scale = 2)
-    private BigDecimal stockAnterior;
+    @Column(name = "costo_unitario", nullable = false, precision = 10, scale = 2)
+    private BigDecimal costoUnitario;
 
-    @Column(name = "stock_nuevo", nullable = false, precision = 10, scale = 2)
-    private BigDecimal stockNuevo;
-
-    @Column(name = "fecha_movimiento", nullable = false)
-    private LocalDateTime fechaMovimiento = LocalDateTime.now();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_ingresoinv", nullable = false)
+    private IngresoInventario ingresoInventario;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_usuario")
-    private Usuario usuario;
+    @JoinColumn(name = "id_proveedor", nullable = false)
+    private Proveedor proveedor;
 }

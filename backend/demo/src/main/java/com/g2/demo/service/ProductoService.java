@@ -3,14 +3,15 @@ package com.g2.demo.service;
 import com.g2.demo.dto.ProductoRequest;
 import com.g2.demo.entity.Categoria;
 import com.g2.demo.entity.Producto;
-import com.g2.demo.entity.Proveedor;
+import com.g2.demo.entity.UnidadMedida;
 import com.g2.demo.repository.CategoriaRepository;
 import com.g2.demo.repository.ProductoRepository;
-import com.g2.demo.repository.ProveedorRepository;
+import com.g2.demo.repository.UnidadMedidaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -18,14 +19,14 @@ public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
-    private final ProveedorRepository proveedorRepository;
+    private final UnidadMedidaRepository unidadMedidaRepository;
 
     public ProductoService(ProductoRepository productoRepository,
                            CategoriaRepository categoriaRepository,
-                           ProveedorRepository proveedorRepository) {
+                           UnidadMedidaRepository unidadMedidaRepository) {
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
-        this.proveedorRepository = proveedorRepository;
+        this.unidadMedidaRepository = unidadMedidaRepository;
     }
 
     public List<Producto> listar() {
@@ -39,7 +40,7 @@ public class ProductoService {
 
     public List<Producto> listarAlertas() {
         return productoRepository.findAll().stream()
-                .filter(p -> p.getStockActual() <= p.getStockMinimo())
+                .filter(p -> p.getStockActual().compareTo(p.getStockMinimo()) <= 0)
                 .toList();
     }
 
@@ -49,21 +50,10 @@ public class ProductoService {
         }
         Producto producto = new Producto();
         producto.setNombre(request.getNombre());
-        producto.setCodigo(request.getCodigo());
-        producto.setDescripcion(request.getDescripcion());
-        producto.setStockMinimo(request.getStockMinimo() != null ? request.getStockMinimo() : 0);
-        producto.setPrecioUnitario(request.getPrecioUnitario());
+        producto.setStockActual(request.getStockActual() != null ? request.getStockActual() : BigDecimal.ZERO);
+        producto.setStockMinimo(request.getStockMinimo() != null ? request.getStockMinimo() : BigDecimal.ZERO);
+        asignarRelaciones(producto, request);
 
-        if (request.getCategoriaId() != null) {
-            Categoria cat = categoriaRepository.findById(request.getCategoriaId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria no encontrada"));
-            producto.setCategoria(cat);
-        }
-        if (request.getProveedorId() != null) {
-            Proveedor prov = proveedorRepository.findById(request.getProveedorId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Proveedor no encontrado"));
-            producto.setProveedor(prov);
-        }
         return productoRepository.save(producto);
     }
 
@@ -72,26 +62,27 @@ public class ProductoService {
         if (request.getNombre() != null && !request.getNombre().isBlank()) {
             existente.setNombre(request.getNombre());
         }
-        if (request.getCodigo() != null) existente.setCodigo(request.getCodigo());
-        if (request.getDescripcion() != null) existente.setDescripcion(request.getDescripcion());
+        if (request.getStockActual() != null) existente.setStockActual(request.getStockActual());
         if (request.getStockMinimo() != null) existente.setStockMinimo(request.getStockMinimo());
-        if (request.getPrecioUnitario() != null) existente.setPrecioUnitario(request.getPrecioUnitario());
-
-        if (request.getCategoriaId() != null) {
-            Categoria cat = categoriaRepository.findById(request.getCategoriaId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria no encontrada"));
-            existente.setCategoria(cat);
-        }
-        if (request.getProveedorId() != null) {
-            Proveedor prov = proveedorRepository.findById(request.getProveedorId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Proveedor no encontrado"));
-            existente.setProveedor(prov);
-        }
+        asignarRelaciones(existente, request);
         return productoRepository.save(existente);
     }
 
     public void eliminar(Long id) {
         buscarPorId(id);
         productoRepository.deleteById(id);
+    }
+
+    private void asignarRelaciones(Producto producto, ProductoRequest request) {
+        if (request.getCategoriaId() != null) {
+            Categoria categoria = categoriaRepository.findById(request.getCategoriaId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria no encontrada"));
+            producto.setCategoria(categoria);
+        }
+        if (request.getUnidadId() != null) {
+            UnidadMedida unidad = unidadMedidaRepository.findById(request.getUnidadId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unidad de medida no encontrada"));
+            producto.setUnidad(unidad);
+        }
     }
 }

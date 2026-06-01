@@ -8,10 +8,8 @@ import java.math.BigDecimal;
 @Setter
 public class ProductoRequest {
     private String nombre;
-    private String codigo;
-    private String descripcion;
-    private Integer stockMinimo;
-    private BigDecimal precioUnitario;
+    private BigDecimal stockActual;
+    private BigDecimal stockMinimo;
     private Long categoriaId;
-    private Long proveedorId;
+    private Long unidadId;
 }

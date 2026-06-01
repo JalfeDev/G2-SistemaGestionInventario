@@ -17,28 +17,22 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
-@Table(name = "productos")
-public class Producto {
+@Table(name = "detalle_solicitud")
+public class DetalleSolicitud {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_producto")
+    @Column(name = "id_detallesol")
     private Long id;
 
-    @Column(nullable = false, length = 120)
-    private String nombre;
-
-    @Column(name = "stock_actual", nullable = false, precision = 10, scale = 2)
-    private BigDecimal stockActual = BigDecimal.ZERO;
-
-    @Column(name = "stock_minimo", nullable = false, precision = 10, scale = 2)
-    private BigDecimal stockMinimo = BigDecimal.ZERO;
+    @Column(name = "cantidad_solicitada", nullable = false, precision = 10, scale = 2)
+    private BigDecimal cantidadSolicitada;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_categoria")
-    private Categoria categoria;
+    @JoinColumn(name = "id_solicitud", nullable = false)
+    private SolicitudCompra solicitud;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_unidad")
-    private UnidadMedida unidad;
+    @JoinColumn(name = "id_producto", nullable = false)
+    private Producto producto;
 }

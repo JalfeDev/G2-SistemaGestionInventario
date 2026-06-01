@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "usuario")
+@Table(name = "usuarios")
 public class Usuario {
 
     @Id
@@ -23,22 +23,41 @@ public class Usuario {
     @Column(name = "id_usuario")
     private Long id;
 
+    @Column(nullable = false, length = 120)
+    private String nombres;
+
+    @Column(length = 120)
+    private String apellidos;
+
     @Column(nullable = false, unique = true, length = 80)
     private String username;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false, length = 120)
-    private String nombre;
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
 
     @Column(unique = true, length = 120)
     private String email;
 
-    @Column(nullable = false)
-    private Boolean activo = true;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
+
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    public void setPassword(String password) {
+        this.passwordHash = password;
+    }
+
+    public String getNombre() {
+        if (apellidos == null || apellidos.isBlank()) {
+            return nombres;
+        }
+        return nombres + " " + apellidos;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombres = nombre;
+    }
 }

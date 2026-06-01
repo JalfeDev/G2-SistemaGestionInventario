@@ -17,32 +17,21 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "distribucion")
-public class Distribucion {
+@Table(name = "ingresos_inventario")
+public class IngresoInventario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_distribucion")
+    @Column(name = "id_ingresoinv")
     private Long id;
 
-    @Column(nullable = false)
-    private Integer cantidad;
+    @Column(name = "fecha_ingreso", nullable = false)
+    private LocalDateTime fechaIngreso = LocalDateTime.now();
 
-    @Column(nullable = false)
-    private LocalDateTime fechaAsignacion = LocalDateTime.now();
-
-    @Column(length = 250)
+    @Column(columnDefinition = "TEXT")
     private String observacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_producto", nullable = false)
-    private Producto producto;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_habitacion", nullable = false)
-    private Habitacion habitacion;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_usuario")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 }

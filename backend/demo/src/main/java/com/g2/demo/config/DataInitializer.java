@@ -45,7 +45,6 @@ public class DataInitializer implements CommandLineRunner {
         Rol rol = rolRepository.findByNombre("GERENTE").orElseGet(() -> {
             Rol nuevoRol = new Rol();
             nuevoRol.setNombre("GERENTE");
-            nuevoRol.setDescripcion("Gerente del hotel");
             return rolRepository.save(nuevoRol);
         });
 
@@ -53,9 +52,9 @@ public class DataInitializer implements CommandLineRunner {
         Usuario usuario = new Usuario();
         usuario.setUsername(adminUsername);
         usuario.setPassword(passwordEncoder.encode(adminPassword));
-        usuario.setNombre("Administrador");
+        usuario.setNombres("Administrador");
+        usuario.setApellidos("");
         usuario.setEmail("");
-        usuario.setActivo(true);
         usuario.setRol(rol);
         usuarioRepository.save(usuario);
     }

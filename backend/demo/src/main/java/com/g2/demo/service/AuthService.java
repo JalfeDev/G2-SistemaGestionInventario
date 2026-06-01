@@ -32,7 +32,7 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByUsernameOrEmail(request.getUsuario(), request.getUsuario())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contrasena incorrectos"));
 
-        if (!Boolean.TRUE.equals(usuario.getActivo()) || !passwordMatches(request.getContrasena(), usuario.getPassword())) {
+        if (!passwordMatches(request.getContrasena(), usuario.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contrasena incorrectos");
         }
 

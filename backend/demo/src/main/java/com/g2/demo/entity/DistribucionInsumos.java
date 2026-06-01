@@ -12,33 +12,27 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "productos")
-public class Producto {
+@Table(name = "distribucion_insumos")
+public class DistribucionInsumos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_producto")
+    @Column(name = "id_distribucion")
     private Long id;
 
-    @Column(nullable = false, length = 120)
-    private String nombre;
-
-    @Column(name = "stock_actual", nullable = false, precision = 10, scale = 2)
-    private BigDecimal stockActual = BigDecimal.ZERO;
-
-    @Column(name = "stock_minimo", nullable = false, precision = 10, scale = 2)
-    private BigDecimal stockMinimo = BigDecimal.ZERO;
+    @Column(nullable = false)
+    private LocalDateTime fecha = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_categoria")
-    private Categoria categoria;
+    @JoinColumn(name = "id_habitacion", nullable = false)
+    private Habitacion habitacion;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_unidad")
-    private UnidadMedida unidad;
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private Usuario usuario;
 }

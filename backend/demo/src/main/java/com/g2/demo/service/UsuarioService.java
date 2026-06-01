@@ -56,9 +56,9 @@ public class UsuarioService {
         Usuario usuario = new Usuario();
         usuario.setUsername(request.getUsername());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-        usuario.setNombre(request.getNombre() != null ? request.getNombre() : request.getUsername());
+        usuario.setNombres(resolveNombres(request));
+        usuario.setApellidos(request.getApellidos());
         usuario.setEmail(request.getEmail());
-        usuario.setActivo(true);
         usuario.setRol(rol);
 
         return new UsuarioResponse(usuarioRepository.save(usuario));
@@ -85,5 +85,15 @@ public class UsuarioService {
         }
         return rolRepository.findById(rolId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no encontrado"));
+    }
+
+    private String resolveNombres(UsuarioRequest request) {
+        if (request.getNombres() != null && !request.getNombres().isBlank()) {
+            return request.getNombres();
+        }
+        if (request.getNombre() != null && !request.getNombre().isBlank()) {
+            return request.getNombre();
+        }
+        return request.getUsername();
     }
 }

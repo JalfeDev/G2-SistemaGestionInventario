@@ -8,14 +8,16 @@ public class UsuarioResponse {
 
     private final Long id;
     private final String usuario;
-    private final String nombre;
+    private final String nombres;
+    private final String apellidos;
     private final String email;
     private final String rol;
 
     public UsuarioResponse(Usuario usuario) {
         this.id = usuario.getId();
         this.usuario = usuario.getUsername();
-        this.nombre = usuario.getNombre();
+        this.nombres = usuario.getNombres();
+        this.apellidos = usuario.getApellidos();
         this.email = usuario.getEmail();
         this.rol = usuario.getRol() != null ? usuario.getRol().getNombre() : null;
     }
