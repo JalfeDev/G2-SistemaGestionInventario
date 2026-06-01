@@ -1,57 +1,18 @@
-const productosMock = [
-  { id: 1, nombre: 'Shampoo', categoria: 'Limpieza', stockActual: 5, stockMinimo: 10, unidad: 'unidad' },
-  { id: 2, nombre: 'Jabón de manos', categoria: 'Limpieza', stockActual: 20, stockMinimo: 15, unidad: 'unidad' },
-  { id: 3, nombre: 'Papel higiénico', categoria: 'Higiene', stockActual: 3, stockMinimo: 20, unidad: 'paquete' },
-  { id: 4, nombre: 'Desinfectante', categoria: 'Limpieza', stockActual: 8, stockMinimo: 5, unidad: 'litro' },
-  { id: 5, nombre: 'Toallas', categoria: 'Habitación', stockActual: 2, stockMinimo: 10, unidad: 'unidad' },
-]
+import { Card, Empty, Icon, Loader, PageHeader, ResourceNotice } from '../components/ui'
+import { fallbackProductos } from '../data/fallbackData'
+import { useApiResource } from '../hooks/useApiResource'
+import { productoService } from '../services/api'
 
-function Alertas() {
-  const criticos = productosMock
-    .filter(p => p.stockActual <= p.stockMinimo)
-    .map(p => ({ ...p, falta: p.stockMinimo - p.stockActual }))
-    .sort((a, b) => b.falta - a.falta)
+const fallback = fallbackProductos.filter((item) => Number(item.stockActual) <= Number(item.stockMinimo))
 
+export default function Alertas() {
+  const alerts = useApiResource(productoService.alertas, fallback)
   return (
-    <div style={{ padding: '24px', fontFamily: 'Arial' }}>
-      <h2>⚠ Alertas de Stock Mínimo</h2>
-      <p style={{ color: '#666' }}>
-        {criticos.length} producto(s) con stock crítico
-      </p>
-
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#1F3864', color: 'white' }}>
-            <th style={{ padding: '10px', textAlign: 'left' }}>Producto</th>
-            <th style={{ padding: '10px', textAlign: 'left' }}>Categoría</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Stock Actual</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Stock Mínimo</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Unidad</th>
-            <th style={{ padding: '10px', textAlign: 'center' }}>Falta</th>
-          </tr>
-        </thead>
-        <tbody>
-          {criticos.map((p, i) => (
-            <tr key={p.id} style={{
-              backgroundColor: i % 2 === 0 ? '#FFF3F3' : '#FFE5E5',
-              borderBottom: '1px solid #ddd'
-            }}>
-              <td style={{ padding: '10px', fontWeight: 'bold' }}>{p.nombre}</td>
-              <td style={{ padding: '10px' }}>{p.categoria}</td>
-              <td style={{ padding: '10px', textAlign: 'center', color: '#cc0000', fontWeight: 'bold' }}>
-                {p.stockActual}
-              </td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>{p.stockMinimo}</td>
-              <td style={{ padding: '10px', textAlign: 'center' }}>{p.unidad}</td>
-              <td style={{ padding: '10px', textAlign: 'center', color: '#cc0000', fontWeight: 'bold' }}>
-                {p.falta}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <PageHeader title="Alertas de stock minimo" description="Prioriza productos que requieren reposicion para evitar quiebres operativos." actions={<button className="button subtle" onClick={alerts.reload}><Icon name="refresh" size={16} /> Actualizar</button>} />
+      <ResourceNotice error={alerts.error} />
+      <div className="alert-summary"><div className="alert-symbol"><Icon name="warning" size={22} /></div><div><strong>{alerts.data.length} productos requieren atencion</strong><span>Revisa los niveles y genera solicitudes de reabastecimiento.</span></div></div>
+      <Card>{alerts.loading ? <Loader /> : alerts.data.length === 0 ? <Empty text="Todo esta bajo control. No existen alertas de stock." /> : <div className="table-wrap"><table><thead><tr><th>Producto</th><th>Categoria</th><th>Unidad</th><th>Stock actual</th><th>Stock minimo</th><th>Faltante</th></tr></thead><tbody>{alerts.data.map((item) => <tr key={item.id}><td><strong>{item.nombre}</strong></td><td>{item.categoria?.nombre || '-'}</td><td>{item.unidad?.abreviatura || item.unidad?.nombre || '-'}</td><td className="stock-danger"><strong>{item.stockActual}</strong></td><td>{item.stockMinimo}</td><td><strong>{Math.max(0, Number(item.stockMinimo) - Number(item.stockActual))}</strong></td></tr>)}</tbody></table></div>}</Card>
+    </>
   )
 }
-
-export default Alertas
