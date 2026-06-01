@@ -64,6 +64,33 @@ public class UsuarioService {
         return new UsuarioResponse(usuarioRepository.save(usuario));
     }
 
+    public UsuarioResponse actualizar(Long id, UsuarioRequest request) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El username es obligatorio");
+        }
+        usuarioRepository.findByUsernameOrEmail(request.getUsername(), request.getEmail())
+                .filter(existing -> !existing.getId().equals(id))
+                .ifPresent(existing -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "El username o email ya existe");
+                });
+
+        usuario.setUsername(request.getUsername());
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        usuario.setNombres(resolveNombres(request));
+        usuario.setApellidos(request.getApellidos());
+        usuario.setEmail(request.getEmail());
+        if (request.getRolId() != null) {
+            usuario.setRol(obtenerRol(request.getRolId()));
+        }
+
+        return new UsuarioResponse(usuarioRepository.save(usuario));
+    }
+
     public UsuarioResponse actualizarRol(Long id, Long rolId) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
