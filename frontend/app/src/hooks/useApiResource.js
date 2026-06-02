@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getApiError } from '../services/api'
+import { getApiError, isCanceledRequest } from '../services/api'
 
-export function useApiResource(load, fallbackData) {
+const EMPTY_DATA = []
+
+export function useApiResource(load, initialData = EMPTY_DATA) {
   const loader = useRef(load)
-  const [data, setData] = useState(fallbackData)
+  const [data, setData] = useState(initialData)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -13,12 +15,13 @@ export function useApiResource(load, fallbackData) {
       setData(response.data)
       setError('')
     } catch (requestError) {
-      setData(fallbackData)
+      if (isCanceledRequest(requestError)) return
+      setData(initialData)
       setError(getApiError(requestError))
     } finally {
       setLoading(false)
     }
-  }, [fallbackData])
+  }, [initialData])
 
   const reload = useCallback(() => {
     setLoading(true)

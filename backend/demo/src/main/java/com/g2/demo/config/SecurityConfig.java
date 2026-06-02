@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -43,6 +45,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/usuarios/**", "/api/roles/**", "/api/categorias/**",
+                                "/api/unidades-medida/**", "/api/reportes/**")
+                        .hasAnyRole("GERENTE", "ADMINISTRADOR")
+                        .requestMatchers("/api/ingresos-inventario/**", "/api/detalles-ingreso/**",
+                                "/api/proveedores/**", "/api/proveedor-producto/**")
+                        .hasAnyRole("GERENTE", "ADMINISTRADOR", "ALMACEN")
+                        .requestMatchers("/api/distribuciones-insumos/**", "/api/detalles-distribucion/**",
+                                "/api/habitaciones/**")
+                        .hasAnyRole("GERENTE", "ADMINISTRADOR", "HOUSEKEEPING")
+                        .requestMatchers("/api/movimientos-inventario/**")
+                        .hasAnyRole("GERENTE", "ADMINISTRADOR", "ALMACEN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

@@ -5,12 +5,14 @@ import com.g2.demo.dto.UsuarioResponse;
 import com.g2.demo.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@PreAuthorize("hasAnyRole('GERENTE','ADMINISTRADOR')")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -44,6 +46,11 @@ public class UsuarioController {
     public UsuarioResponse cambiarRol(@PathVariable Long id, @RequestBody Map<String, Long> body) {
         Long rolId = body.get("rolId");
         return usuarioService.actualizarRol(id, rolId);
+    }
+
+    @PatchMapping("/{id}/activo")
+    public UsuarioResponse cambiarActivo(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+        return usuarioService.actualizarActivo(id, body.get("activo"));
     }
 
     @DeleteMapping("/{id}")

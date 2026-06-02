@@ -75,6 +75,10 @@ public class JwtUtil {
         return rol != null ? rol.toString() : null;
     }
 
+    public long getExpirationEpochSeconds(String token) {
+        return getExpiration(getClaims(token));
+    }
+
     public Map<String, Object> getClaims(String token) {
         String[] parts = splitToken(token);
         verifySignature(parts[0] + "." + parts[1], parts[2]);
