@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getStoredUser } from '../utils/roles'
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -10,16 +11,25 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('hotel_token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
+  if (token && !config.url?.includes('/auth/login')) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
+    const status = error.response?.status
+    if (status === 401 && !error.config?.url?.includes('/auth/login')) {
+      localStorage.setItem('hotel_auth_message', 'Sesión expirada o no autorizada.')
       localStorage.removeItem('hotel_token')
       localStorage.removeItem('hotel_user')
+      if (window.location.pathname !== '/login') window.location.assign('/login')
+    }
+    if (status === 403) {
+      console.warn('No tienes permisos para esta acción.', {
+        endpoint: `${error.config?.method?.toUpperCase() || 'REQUEST'} ${error.config?.url || ''}`,
+        rol: getStoredUser().rol || 'SIN_ROL',
+      })
     }
     return Promise.reject(error)
   },
@@ -36,6 +46,7 @@ const crud = (path) => ({
 export const authService = {
   login: (usuario, contrasena) => api.post('/auth/login', { usuario, contrasena }),
   me: () => api.get('/auth/me'),
+  logout: () => api.post('/auth/logout'),
 }
 
 export const productoService = {
@@ -45,9 +56,15 @@ export const productoService = {
 
 export const proveedorService = crud('/proveedores')
 export const proveedorProductoService = crud('/proveedor-producto')
-export const ingresoService = crud('/ingresos-inventario')
+export const ingresoService = {
+  listar: () => api.get('/ingresos-inventario'),
+  registrar: (data) => api.post('/ingresos-inventario', data),
+}
 export const detalleIngresoService = crud('/detalles-ingreso')
-export const distribucionService = crud('/distribuciones-insumos')
+export const distribucionService = {
+  listar: (params = {}) => api.get('/distribuciones-insumos', { params }),
+  registrar: (data) => api.post('/distribuciones-insumos', data),
+}
 export const detalleDistribucionService = crud('/detalles-distribucion')
 export const solicitudService = crud('/solicitudes-compra')
 export const detalleSolicitudService = crud('/detalles-solicitud')
@@ -56,15 +73,35 @@ export const movimientoService = crud('/movimientos-inventario')
 export const usuarioService = {
   ...crud('/usuarios'),
   cambiarRol: (id, rolId) => api.patch(`/usuarios/${id}/rol`, { rolId }),
+  cambiarActivo: (id, activo) => api.patch(`/usuarios/${id}/activo`, { activo }),
 }
 export const categoriaService = crud('/categorias')
 export const unidadService = crud('/unidades-medida')
 export const rolService = crud('/roles')
 export const habitacionService = crud('/habitaciones')
+export const reporteService = {
+  consultar: (fechaInicio, fechaFin) => api.get('/reportes/consumo', { params: { fechaInicio, fechaFin } }),
+  descargarPdf: (fechaInicio, fechaFin) => api.get('/reportes/consumo/pdf', { params: { fechaInicio, fechaFin }, responseType: 'blob' }),
+}
+
+export function isCanceledRequest(error) {
+  return axios.isCancel(error) || error?.code === 'ERR_CANCELED' || error?.name === 'AbortError'
+}
 
 export function getApiError(error, fallback = 'No se pudo completar la operacion.') {
-  if (!error?.response) return 'El backend no esta disponible. Se muestran datos temporales.'
-  return error.response.data?.message || error.response.data?.error || fallback
+  if (isCanceledRequest(error)) return ''
+  const status = error?.response?.status
+  const detail = error?.response?.data?.detail || error?.response?.data?.message || error?.response?.data?.error
+  if (status === 401) {
+    return error.config?.url?.includes('/auth/login')
+      ? detail || fallback
+      : 'Sesión expirada o no autorizada.'
+  }
+  if (status === 403) return 'No tienes permisos para esta acción.'
+  if (status === 404) return 'Endpoint no encontrado.'
+  if (status >= 500) return 'Error interno del servidor.'
+  if (!error?.response) return 'Backend no disponible. Verifica que el servicio este iniciado.'
+  return detail || fallback
 }
 
 export default api

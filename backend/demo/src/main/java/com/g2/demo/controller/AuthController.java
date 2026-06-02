@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
@@ -39,5 +40,12 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token JWT requerido");
         }
         return authService.getCurrentUser(principal.getName());
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        authService.logout(header != null && header.startsWith("Bearer ") ? header.substring(7) : null);
     }
 }

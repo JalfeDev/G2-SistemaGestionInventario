@@ -60,7 +60,7 @@ export function Empty({ text = 'No hay registros para mostrar.' }) {
 
 export function ResourceNotice({ error }) {
   if (!error) return null
-  return <Notice tone="warning">{error} Puedes seguir explorando la interfaz con la informacion temporal.</Notice>
+  return <Notice tone="danger">{error}</Notice>
 }
 
 export function SearchBox({ value, onChange, placeholder = 'Buscar...' }) {

@@ -1,5 +1,7 @@
 package com.g2.demo.config;
 
+import com.g2.demo.entity.Usuario;
+import com.g2.demo.repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,9 +21,18 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final RevokedTokenService revokedTokenService;
+    private final UsuarioRepository usuarioRepository;
 
-    public JwtFilter(JwtUtil jwtUtil) {
+    public JwtFilter(JwtUtil jwtUtil, RevokedTokenService revokedTokenService, UsuarioRepository usuarioRepository) {
         this.jwtUtil = jwtUtil;
+        this.revokedTokenService = revokedTokenService;
+        this.usuarioRepository = usuarioRepository;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "/api/auth/login".equals(request.getServletPath());
     }
 
     @Override
@@ -34,17 +45,26 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!jwtUtil.isValid(token)) {
+        if (!jwtUtil.isValid(token) || revokedTokenService.isRevoked(token)) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token JWT invalido o expirado");
             return;
         }
 
         String username = jwtUtil.getUsername(token);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            Usuario usuario = usuarioRepository.findByUsernameOrEmail(username, username).orElse(null);
+            if (usuario == null || Boolean.FALSE.equals(usuario.getActivo())) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuario desactivado o inexistente");
+                return;
+            }
+            if (usuario.getRol() == null || !Roles.VALIDOS.contains(usuario.getRol().getNombre())) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuario sin rol autorizado");
+                return;
+            }
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     username,
                     null,
-                    authorities(jwtUtil.getRol(token))
+                    authorities(usuario.getRol().getNombre())
             );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);

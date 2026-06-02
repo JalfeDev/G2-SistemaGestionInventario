@@ -12,6 +12,7 @@ public class UsuarioResponse {
     private final String apellidos;
     private final String email;
     private final String rol;
+    private final Boolean activo;
 
     public UsuarioResponse(Usuario usuario) {
         this.id = usuario.getId();
@@ -20,5 +21,6 @@ public class UsuarioResponse {
         this.apellidos = usuario.getApellidos();
         this.email = usuario.getEmail();
         this.rol = usuario.getRol() != null ? usuario.getRol().getNombre() : null;
+        this.activo = usuario.getActivo();
     }
 }
