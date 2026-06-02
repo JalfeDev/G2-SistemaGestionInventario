@@ -3,6 +3,7 @@ package com.g2.demo.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,7 +31,7 @@ public class SecurityConfig {
 
     public SecurityConfig(
             JwtFilter jwtFilter,
-            @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl
+            @Value("${FRONTEND_URL:${frontendURL:http://localhost:5173}}") String frontendUrl
     ) {
         this.jwtFilter = jwtFilter;
         this.frontendUrl = frontendUrl;
@@ -43,6 +44,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/usuarios/**", "/api/roles/**", "/api/categorias/**",
@@ -93,9 +95,7 @@ public class SecurityConfig {
         }
 
         String lower = normalized.toLowerCase();
-        String scheme = lower.startsWith("localhost") || lower.startsWith("127.0.0.1")
-                ? "http://"
-                : "https://";
+        String scheme = (lower.startsWith("localhost") || lower.startsWith("127.0.0.1")) ? "http://" : "https://";
         return scheme + normalized;
     }
 
