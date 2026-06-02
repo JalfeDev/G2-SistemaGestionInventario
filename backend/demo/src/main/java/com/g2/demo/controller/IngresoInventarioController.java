@@ -2,7 +2,7 @@ package com.g2.demo.controller;
 
 import com.g2.demo.dto.RegistrarEntradaRequest;
 import com.g2.demo.entity.DetalleIngreso;
-import com.g2.demo.service.IngresoInventarioService;
+import com.g2.demo.facade.AlmacenFacade;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,20 +20,20 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('GERENTE','ADMINISTRADOR','ALMACEN')")
 public class IngresoInventarioController {
 
-    private final IngresoInventarioService service;
+    private final AlmacenFacade facade;
 
-    public IngresoInventarioController(IngresoInventarioService service) {
-        this.service = service;
+    public IngresoInventarioController(AlmacenFacade facade) {
+        this.facade = facade;
     }
 
     @GetMapping
     public List<DetalleIngreso> listar() {
-        return service.listarHistorial();
+        return facade.listarHistorial();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DetalleIngreso registrar(@RequestBody RegistrarEntradaRequest request, Principal principal) {
-        return service.registrar(request, principal.getName());
+        return facade.registrarEntrada(request, principal.getName());
     }
 }

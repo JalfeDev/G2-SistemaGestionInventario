@@ -2,7 +2,7 @@ package com.g2.demo.controller;
 
 import com.g2.demo.dto.RegistrarDistribucionRequest;
 import com.g2.demo.entity.DetalleDistribucion;
-import com.g2.demo.service.DistribucionInsumosService;
+import com.g2.demo.facade.HousekeepingFacade;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,10 +23,10 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('GERENTE','ADMINISTRADOR','HOUSEKEEPING')")
 public class DistribucionInsumosController {
 
-    private final DistribucionInsumosService service;
+    private final HousekeepingFacade facade;
 
-    public DistribucionInsumosController(DistribucionInsumosService service) {
-        this.service = service;
+    public DistribucionInsumosController(HousekeepingFacade facade) {
+        this.facade = facade;
     }
 
     @GetMapping
@@ -34,12 +34,12 @@ public class DistribucionInsumosController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
             @RequestParam(required = false) Long habitacionId) {
-        return service.listarHistorial(fechaInicio, fechaFin, habitacionId);
+        return facade.listarHistorial(fechaInicio, fechaFin, habitacionId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DetalleDistribucion registrar(@RequestBody RegistrarDistribucionRequest request, Principal principal) {
-        return service.registrar(request, principal.getName());
+        return facade.registrarDistribucion(request, principal.getName());
     }
 }
