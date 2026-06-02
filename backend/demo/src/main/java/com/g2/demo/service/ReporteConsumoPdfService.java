@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class ReporteConsumoPdfService {
         List<String> lineas = new ArrayList<>();
         lineas.add("Hotel Piramide - Reporte de consumo de inventario");
         lineas.add("Periodo: " + reporte.getFechaInicio() + " al " + reporte.getFechaFin());
+        lineas.add("Fecha de generacion: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         lineas.add("");
         if (reporte.getCategorias().isEmpty()) {
             lineas.add("No hay movimientos de consumo en el rango seleccionado.");
