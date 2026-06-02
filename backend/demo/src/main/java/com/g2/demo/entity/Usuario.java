@@ -42,6 +42,9 @@ public class Usuario {
     @JoinColumn(name = "id_rol", nullable = false)
     private Rol rol;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private Boolean activo = true;
+
     public String getPassword() {
         return passwordHash;
     }

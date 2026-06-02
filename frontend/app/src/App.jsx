@@ -1,20 +1,28 @@
 import { Navigate, Route, BrowserRouter, Routes } from 'react-router-dom'
 import AppLayout from './components/AppLayout'
 import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
 import Productos from './pages/Productos'
 import Entradas from './pages/Entradas'
 import Distribuciones from './pages/Distribuciones'
-import Proveedores from './pages/Proveedores'
 import Usuarios from './pages/Usuarios'
-import ImportacionCsv from './pages/ImportacionCsv'
-import HistorialPrecios from './pages/HistorialPrecios'
-import Solicitudes from './pages/Solicitudes'
+import Stock from './pages/Stock'
 import Alertas from './pages/Alertas'
+import ReporteConsumo from './pages/ReporteConsumo'
+import Configuracion from './pages/Configuracion'
+import { defaultRouteForRole, getStoredUser, ROLES } from './utils/roles'
+
+const ADMINISTRADOR = [ROLES.ADMINISTRADOR]
+const GERENTE = [ROLES.GERENTE]
+const ENCARGADO_ALMACEN = [ROLES.ENCARGADO_ALMACEN]
+const HOUSEKEEPER = [ROLES.HOUSEKEEPER]
 
 function ProtectedLayout() {
-  const hasSession = localStorage.getItem('hotel_token') || localStorage.getItem('hotel_demo')
-  return hasSession ? <AppLayout /> : <Navigate to="/login" replace />
+  return localStorage.getItem('hotel_token') ? <AppLayout /> : <Navigate to="/login" replace />
+}
+
+function AllowedRoute({ roles, children }) {
+  const user = getStoredUser()
+  return roles.includes(user.rol) ? children : <Navigate to={defaultRouteForRole(user.rol)} replace />
 }
 
 export default function App() {
@@ -23,18 +31,16 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route element={<ProtectedLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/productos" element={<Productos />} />
-          <Route path="/entradas" element={<Entradas />} />
-          <Route path="/distribuciones" element={<Distribuciones />} />
-          <Route path="/proveedores" element={<Proveedores />} />
-          <Route path="/usuarios" element={<Usuarios />} />
-          <Route path="/importacion" element={<ImportacionCsv />} />
-          <Route path="/historial-precios" element={<HistorialPrecios />} />
-          <Route path="/solicitudes" element={<Solicitudes />} />
-          <Route path="/alertas" element={<Alertas />} />
+          <Route path="/stock" element={<AllowedRoute roles={ENCARGADO_ALMACEN}><Stock /></AllowedRoute>} />
+          <Route path="/alertas" element={<AllowedRoute roles={GERENTE}><Alertas /></AllowedRoute>} />
+          <Route path="/productos" element={<AllowedRoute roles={ADMINISTRADOR}><Productos /></AllowedRoute>} />
+          <Route path="/entradas" element={<AllowedRoute roles={ENCARGADO_ALMACEN}><Entradas /></AllowedRoute>} />
+          <Route path="/distribuciones" element={<AllowedRoute roles={HOUSEKEEPER}><Distribuciones /></AllowedRoute>} />
+          <Route path="/usuarios" element={<AllowedRoute roles={ADMINISTRADOR}><Usuarios /></AllowedRoute>} />
+          <Route path="/reporte-consumo" element={<AllowedRoute roles={GERENTE}><ReporteConsumo /></AllowedRoute>} />
+          <Route path="/configuracion" element={<AllowedRoute roles={ADMINISTRADOR}><Configuracion /></AllowedRoute>} />
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to={localStorage.getItem('hotel_token') ? defaultRouteForRole(getStoredUser().rol) : '/login'} replace />} />
       </Routes>
     </BrowserRouter>
   )

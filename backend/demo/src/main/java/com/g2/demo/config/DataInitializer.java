@@ -9,6 +9,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -37,25 +39,32 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        Map<String, Rol> roles = Roles.VALIDOS.stream().collect(java.util.stream.Collectors.toMap(
+                nombre -> nombre,
+                nombre -> rolRepository.findByNombre(nombre).orElseGet(() -> {
+                    Rol nuevoRol = new Rol();
+                    nuevoRol.setNombre(nombre);
+                    return rolRepository.save(nuevoRol);
+                })
+        ));
+        usuarioRepository.findAll().stream()
+                .filter(usuario -> usuario.getActivo() == null)
+                .forEach(usuario -> {
+                    usuario.setActivo(true);
+                    usuarioRepository.save(usuario);
+                });
         if (!enabled || usuarioRepository.findByUsernameOrEmail(adminUsername, adminUsername).isPresent()) {
             return;
         }
 
-        //Crear el ron de gerente en la tabla rol si no hay uno con el rol de GERENTE
-        Rol rol = rolRepository.findByNombre("GERENTE").orElseGet(() -> {
-            Rol nuevoRol = new Rol();
-            nuevoRol.setNombre("GERENTE");
-            return rolRepository.save(nuevoRol);
-        });
-
-        //Crear un nuevo usuario en la tabla usuario si no hay uno con el rol de GERENTE
         Usuario usuario = new Usuario();
         usuario.setUsername(adminUsername);
         usuario.setPassword(passwordEncoder.encode(adminPassword));
         usuario.setNombres("Administrador");
         usuario.setApellidos("");
         usuario.setEmail("");
-        usuario.setRol(rol);
+        usuario.setRol(roles.get(Roles.GERENTE));
+        usuario.setActivo(true);
         usuarioRepository.save(usuario);
     }
 }
