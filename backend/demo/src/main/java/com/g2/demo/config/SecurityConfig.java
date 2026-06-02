@@ -69,6 +69,8 @@ public class SecurityConfig {
                 Arrays.stream(frontendUrl.split(","))
                         .map(String::trim)
                         .filter(origin -> !origin.isBlank())
+                        .map(SecurityConfig::normalizeOrigin)
+                        .distinct()
                         .toList()
         );
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
@@ -79,6 +81,22 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    private static String normalizeOrigin(String origin) {
+        String normalized = origin.trim();
+        while (normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        if (normalized.startsWith("http://") || normalized.startsWith("https://")) {
+            return normalized;
+        }
+
+        String lower = normalized.toLowerCase();
+        String scheme = lower.startsWith("localhost") || lower.startsWith("127.0.0.1")
+                ? "http://"
+                : "https://";
+        return scheme + normalized;
     }
 
     @Bean
