@@ -1,0 +1,197 @@
+@startuml
+hide circle
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+entity "Roles" as roles {
+    * id_rol : INT <<PK>>
+    --
+    nombre : VARCHAR
+}
+
+entity "Usuarios" as usuarios {
+    * id_usuario : INT <<PK>>
+    --
+    nombres : VARCHAR
+    apellidos : VARCHAR
+    username : VARCHAR
+    password_hash : VARCHAR
+    email : VARCHAR
+    id_rol : INT <<FK>>
+}
+
+entity "Categorias" as categorias {
+    * id_categoria : INT <<PK>>
+    --
+    nombre : VARCHAR
+}
+
+entity "Unidades_Medida" as unidades {
+    * id_unidad : INT <<PK>>
+    --
+    nombre : VARCHAR
+    abreviatura : VARCHAR
+}
+
+entity "Productos" as productos {
+    * id_producto : INT <<PK>>
+    --
+    nombre : VARCHAR
+    stock_actual : DECIMAL
+    stock_minimo : DECIMAL
+
+    id_categoria : INT <<FK>>
+    id_unidad : INT <<FK>>
+}
+
+entity "Proveedores" as proveedores {
+    * id_proveedor : INT <<PK>>
+    --
+    nombre : VARCHAR
+    ruc : INT
+    telefono : VARCHAR
+    correo : VARCHAR
+    direccion : VARCHAR
+}
+
+' Resuelve RF-32
+entity "Proveedor_Producto" as proveedor_prod {
+    * id : INT <<PK>>
+    --
+    id_proveedor : INT <<FK>>
+    id_producto : INT <<FK>>
+}
+
+' Cabecera del ingreso
+entity "Ingresos_Inventario" as ingresos {
+    * id_ingresoinv : INT <<PK>>
+    --
+    fecha_ingreso : DATETIME
+    observacion : TEXT
+    id_usuario : INT <<FK>>
+}
+
+' Cumple RF-33
+entity "Detalle_Ingreso" as detalle_ingreso {
+    * id_detalle : INT <<PK>>
+    --
+    cantidad : DECIMAL
+    costo_unitario : DECIMAL
+
+    id_ingresoinv : INT <<FK>>
+    id_producto : INT <<FK>>
+    id_proveedor : INT <<FK>>
+}
+
+' Kardex o historial de movimientos
+' Tipo: INGRESO, SALIDA o AJUSTE
+entity "Movimientos_Inventario" as movimientos_inv {
+    * id_movimiento : INT <<PK>>
+    --
+    tipo_movimiento : VARCHAR
+    cantidad : DECIMAL
+    stock_anterior : DECIMAL
+    stock_nuevo : DECIMAL
+    fecha_movimiento : DATETIME
+
+    id_producto : INT <<FK>>
+    id_usuario : INT <<FK>>
+}
+
+entity "Habitaciones" as habitaciones {
+    * id_habitacion : INT <<PK>>
+    --
+    numero : VARCHAR
+    piso : INT
+}
+
+' Historial de uso de habitaciones
+entity "Distribucion_Insumos" as distribucion {
+    * id_distribucion : INT <<PK>>
+    --
+    fecha : DATETIME
+
+    id_habitacion : INT <<FK>>
+    id_usuario : INT <<FK>>
+}
+
+' Cumple RF-16
+entity "Detalle_Distribucion" as detalle_distribucion {
+    * id_detalledistr : INT <<PK>>
+    --
+    cantidad : DECIMAL
+
+    id_distribucion : INT <<FK>>
+    id_producto : INT <<FK>>
+}
+
+' Cumple RF-23, RF-24 y RF-25
+' estado: PENDIENTE, APROBADO, RECHAZADO
+' solicitante es user Encargado, aprobador es user Gerente
+entity "Solicitudes_Compra" as solicitudes {
+    * id_solicitud : INT <<PK>>
+    --
+    fecha_solicitud : DATETIME
+    estado : VARCHAR
+    fecha_respuesta : DATETIME
+    comentario : TEXT
+
+    id_solicitante : INT <<FK>>
+    id_aprobador : INT <<FK>>
+}
+
+entity "Detalle_Solicitud" as detalle_solicitud {
+    * id_detallesol : INT <<PK>>
+    --
+    cantidad_solicitada : DECIMAL
+
+    id_solicitud : INT <<FK>>
+    id_producto : INT <<FK>>
+}
+
+entity "Notificaciones" as notificaciones {
+    * id_notificacion : INT <<PK>>
+    --
+    mensaje : TEXT
+    fecha : DATETIME
+    leido : BOOLEAN
+
+    id_usuario : INT <<FK>>
+}
+
+'=========================
+' RELACIONES
+'=========================
+
+roles --> usuarios : 1...N
+
+categorias --> productos : 1...N
+unidades --> productos : 1...N
+
+usuarios --> ingresos : 1...N
+
+ingresos --> detalle_ingreso : 1...N
+productos --> detalle_ingreso : 1...N
+proveedores --> detalle_ingreso : 1...N
+
+proveedores --> proveedor_prod : 1...N
+productos --> proveedor_prod : 1...N
+
+productos --> movimientos_inv : 1...N
+usuarios --> movimientos_inv : 1...N
+
+habitaciones --> distribucion : 1...N
+usuarios --> distribucion : 1...N
+
+distribucion --> detalle_distribucion : 1...N
+productos --> detalle_distribucion : 1...N
+
+usuarios --> solicitudes : crea:1...N
+usuarios --> solicitudes : aprueba:1...N
+
+solicitudes --> detalle_solicitud : 1...N
+productos --> detalle_solicitud : 1...N
+
+usuarios --> notificaciones : 1...N
+
+@enduml
