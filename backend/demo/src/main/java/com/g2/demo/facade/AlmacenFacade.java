@@ -1,5 +1,6 @@
 package com.g2.demo.facade;
 
+import com.g2.demo.dto.HistorialPreciosResponse;
 import com.g2.demo.dto.RegistrarEntradaRequest;
 import com.g2.demo.entity.DetalleIngreso;
 import com.g2.demo.service.IngresoInventarioService;
@@ -23,5 +24,10 @@ public class AlmacenFacade {
     // Simplifica el acceso del controller al caso de uso que coordina entradas, stock y movimientos.
     public DetalleIngreso registrarEntrada(RegistrarEntradaRequest request, String username) {
         return ingresoInventarioService.registrar(request, username);
+    }
+
+    //HU - Historial de precios por proveedor
+    public HistorialPreciosResponse consultarHistorialPrecios(Long productoId, Long proveedorId) {
+        return ingresoInventarioService.consultarHistorialPrecios(productoId, proveedorId);
     }
 }

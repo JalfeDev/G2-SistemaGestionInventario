@@ -1,5 +1,7 @@
 package com.g2.demo.service;
 
+import com.g2.demo.dto.HistorialPrecioItem;
+import com.g2.demo.dto.HistorialPreciosResponse;
 import com.g2.demo.dto.RegistrarEntradaRequest;
 import com.g2.demo.entity.DetalleIngreso;
 import com.g2.demo.entity.IngresoInventario;
@@ -91,7 +93,7 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
     }
 
     private MovimientoInventario crearMovimiento(String tipo, BigDecimal cantidad, BigDecimal anterior,
-                                                  BigDecimal nuevo, Producto producto, Usuario usuario) {
+                                                 BigDecimal nuevo, Producto producto, Usuario usuario) {
         MovimientoInventario movimiento = new MovimientoInventario();
         movimiento.setTipoMovimiento(tipo);
         movimiento.setCantidad(cantidad);
@@ -113,5 +115,45 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         if (request.getCostoUnitario() == null || request.getCostoUnitario().signum() < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio unitario no puede ser negativo");
         }
+    }
+
+    //HU - Historial de precios por proveedor
+    public HistorialPreciosResponse consultarHistorialPrecios(Long productoId, Long proveedorId) {
+        // 1. Obtener del repositorio del más reciente al más antiguo
+        List<DetalleIngreso> historialFiltrado;
+        if (productoId != null && proveedorId != null) {
+            historialFiltrado = detalleRepository
+                    .findByProducto_IdAndProveedor_IdOrderByIngresoInventarioFechaIngresoDesc(productoId, proveedorId);
+        } else if (productoId != null) {
+            historialFiltrado = detalleRepository.findByProducto_IdOrderByIngresoInventarioFechaIngresoDesc(productoId);
+        } else if (proveedorId != null) {
+            historialFiltrado = detalleRepository.findByProveedor_IdOrderByIngresoInventarioFechaIngresoDesc(proveedorId);
+        } else {
+            historialFiltrado = detalleRepository.findAllByOrderByIngresoInventarioFechaIngresoDesc();
+        }
+
+        // 2. Calcular el precio promedio de los elementos filtrados
+        BigDecimal precioPromedio = BigDecimal.ZERO;
+        if (!historialFiltrado.isEmpty()) {
+            BigDecimal sumaPrecios = historialFiltrado.stream()
+                    .map(DetalleIngreso::getCostoUnitario)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            precioPromedio = sumaPrecios.divide(
+                    BigDecimal.valueOf(historialFiltrado.size()),
+                    2,
+                    java.math.RoundingMode.HALF_UP
+            );
+        }
+
+        // 3. Empaquetar y retornar el DTO de respuesta con items planos
+        List<HistorialPrecioItem> items = historialFiltrado.stream()
+                .map(HistorialPrecioItem::new)
+                .toList();
+
+        HistorialPreciosResponse response = new HistorialPreciosResponse();
+        response.setHistorial(items);
+        response.setPrecioPromedio(precioPromedio);
+        return response;
     }
 }
