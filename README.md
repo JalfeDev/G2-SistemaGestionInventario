@@ -1,6 +1,9 @@
 # Sistema de Gestión de Inventario — Hotel Pirámide
 
-> **Ingeniería de Software II · Grupo 2**  
+# Link
+[LINK A LA PAGINA](https://frontend-g2-sistemagestioninventario-itsajob.up.railway.app/login)
+
+> **Ingeniería de Software II · Grupo 2**
 > Universidad de Lima — Facultad de Ingeniería de Sistemas
 
 ---
