@@ -25,6 +25,7 @@ import com.g2.demo.repository.UnidadMedidaRepository;
 import com.g2.demo.repository.UsuarioRepository;
 import com.g2.demo.service.DistribucionInsumosService;
 import com.g2.demo.service.IngresoInventarioService;
+import com.g2.demo.service.NotificacionStockService;
 import com.g2.demo.service.ProductoService;
 import com.g2.demo.service.ReporteConsumoPdfService;
 import com.g2.demo.service.ReporteConsumoService;
@@ -75,6 +76,8 @@ class Sprint1BusinessRulesTests {
     private UsuarioRepository usuarioRepository;
     @Mock
     private MovimientoInventarioRepository movimientoRepository;
+    @Mock
+    private NotificacionStockService notificacionStockService;
 
     private IngresoInventarioService ingresoService;
     private DistribucionInsumosService distribucionService;
@@ -82,9 +85,9 @@ class Sprint1BusinessRulesTests {
     @BeforeEach
     void setUp() {
         ingresoService = new IngresoInventarioService(ingresoRepository, detalleIngresoRepository, productoRepository,
-                proveedorRepository, usuarioRepository, movimientoRepository);
+                proveedorRepository, usuarioRepository, movimientoRepository, notificacionStockService);
         distribucionService = new DistribucionInsumosService(distribucionRepository, detalleDistribucionRepository,
-                productoRepository, habitacionRepository, usuarioRepository, movimientoRepository);
+                productoRepository, habitacionRepository, usuarioRepository, movimientoRepository, notificacionStockService);
     }
 
     @Test
@@ -107,6 +110,7 @@ class Sprint1BusinessRulesTests {
         ArgumentCaptor<MovimientoInventario> movimiento = ArgumentCaptor.forClass(MovimientoInventario.class);
         verify(movimientoRepository).save(movimiento.capture());
         assertEquals("ENTRADA", movimiento.getValue().getTipoMovimiento());
+        verify(notificacionStockService).evaluarStockCritico(producto);
     }
 
     @Test
@@ -141,6 +145,7 @@ class Sprint1BusinessRulesTests {
         ArgumentCaptor<MovimientoInventario> movimiento = ArgumentCaptor.forClass(MovimientoInventario.class);
         verify(movimientoRepository).save(movimiento.capture());
         assertEquals("SALIDA", movimiento.getValue().getTipoMovimiento());
+        verify(notificacionStockService).evaluarStockCritico(producto);
     }
 
     @Test
@@ -183,7 +188,7 @@ class Sprint1BusinessRulesTests {
         ProductoRequest request = new ProductoRequest();
         request.setStockActual(new BigDecimal("9"));
         ProductoService productoService = new ProductoService(
-                productoRepository, categoriaRepository, unidadMedidaRepository, movimientoRepository);
+                productoRepository, categoriaRepository, unidadMedidaRepository, movimientoRepository, notificacionStockService);
 
         assertThrows(ResponseStatusException.class, () -> productoService.actualizar(1L, request));
         verify(productoRepository, never()).save(any());
