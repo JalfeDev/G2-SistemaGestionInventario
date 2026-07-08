@@ -69,6 +69,10 @@ export const detalleDistribucionService = crud('/detalles-distribucion')
 export const solicitudService = crud('/solicitudes-compra')
 export const detalleSolicitudService = crud('/detalles-solicitud')
 export const notificacionService = crud('/notificaciones')
+export const notificacionStockService = {
+  listar: () => api.get('/notificaciones-stock'),
+  ultimas: () => api.get('/notificaciones-stock/ultimas'),
+}
 export const movimientoService = crud('/movimientos-inventario')
 export const usuarioService = {
   ...crud('/usuarios'),

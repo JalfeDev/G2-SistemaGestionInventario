@@ -33,13 +33,15 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
     private final ProveedorRepository proveedorRepository;
     private final UsuarioRepository usuarioRepository;
     private final MovimientoInventarioRepository movimientoRepository;
+    private final NotificacionStockService notificacionStockService;
 
     public IngresoInventarioService(IngresoInventarioRepository repository,
                                     DetalleIngresoRepository detalleRepository,
                                     ProductoRepository productoRepository,
                                     ProveedorRepository proveedorRepository,
                                     UsuarioRepository usuarioRepository,
-                                    MovimientoInventarioRepository movimientoRepository) {
+                                    MovimientoInventarioRepository movimientoRepository,
+                                    NotificacionStockService notificacionStockService) {
         super(repository, "Ingreso de inventario");
         this.ingresoRepository = repository;
         this.detalleRepository = detalleRepository;
@@ -47,6 +49,7 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         this.proveedorRepository = proveedorRepository;
         this.usuarioRepository = usuarioRepository;
         this.movimientoRepository = movimientoRepository;
+        this.notificacionStockService = notificacionStockService;
     }
 
     public List<DetalleIngreso> listarHistorial() {
@@ -84,6 +87,7 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         producto.setStockActual(stockNuevo);
         productoRepository.save(producto);
         movimientoRepository.save(crearMovimiento("ENTRADA", request.getCantidad(), stockAnterior, stockNuevo, producto, usuario));
+        notificacionStockService.evaluarStockCritico(producto);
         return detalle;
     }
 

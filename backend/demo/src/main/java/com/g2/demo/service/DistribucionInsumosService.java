@@ -32,13 +32,15 @@ public class DistribucionInsumosService extends CrudService<DistribucionInsumos>
     private final HabitacionRepository habitacionRepository;
     private final UsuarioRepository usuarioRepository;
     private final MovimientoInventarioRepository movimientoRepository;
+    private final NotificacionStockService notificacionStockService;
 
     public DistribucionInsumosService(DistribucionInsumosRepository repository,
                                       DetalleDistribucionRepository detalleRepository,
                                       ProductoRepository productoRepository,
                                       HabitacionRepository habitacionRepository,
                                       UsuarioRepository usuarioRepository,
-                                      MovimientoInventarioRepository movimientoRepository) {
+                                      MovimientoInventarioRepository movimientoRepository,
+                                      NotificacionStockService notificacionStockService) {
         super(repository, "Distribucion de insumos");
         this.distribucionRepository = repository;
         this.detalleRepository = detalleRepository;
@@ -46,6 +48,7 @@ public class DistribucionInsumosService extends CrudService<DistribucionInsumos>
         this.habitacionRepository = habitacionRepository;
         this.usuarioRepository = usuarioRepository;
         this.movimientoRepository = movimientoRepository;
+        this.notificacionStockService = notificacionStockService;
     }
 
     public List<DetalleDistribucion> listarHistorial(LocalDate fechaInicio, LocalDate fechaFin, Long habitacionId) {
@@ -96,6 +99,7 @@ public class DistribucionInsumosService extends CrudService<DistribucionInsumos>
         movimiento.setProducto(producto);
         movimiento.setUsuario(usuario);
         movimientoRepository.save(movimiento);
+        notificacionStockService.evaluarStockCritico(producto);
         return detalle;
     }
 

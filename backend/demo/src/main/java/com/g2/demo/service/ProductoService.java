@@ -23,15 +23,18 @@ public class ProductoService {
     private final CategoriaRepository categoriaRepository;
     private final UnidadMedidaRepository unidadMedidaRepository;
     private final MovimientoInventarioRepository movimientoInventarioRepository;
+    private final NotificacionStockService notificacionStockService;
 
     public ProductoService(ProductoRepository productoRepository,
                            CategoriaRepository categoriaRepository,
                            UnidadMedidaRepository unidadMedidaRepository,
-                           MovimientoInventarioRepository movimientoInventarioRepository) {
+                           MovimientoInventarioRepository movimientoInventarioRepository,
+                           NotificacionStockService notificacionStockService) {
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
         this.unidadMedidaRepository = unidadMedidaRepository;
         this.movimientoInventarioRepository = movimientoInventarioRepository;
+        this.notificacionStockService = notificacionStockService;
     }
 
     public List<Producto> listar() {
@@ -63,7 +66,9 @@ public class ProductoService {
         producto.setStockMinimo(request.getStockMinimo() != null ? request.getStockMinimo() : BigDecimal.ZERO);
         asignarRelaciones(producto, request);
 
-        return productoRepository.save(producto);
+        Producto guardado = productoRepository.save(producto);
+        notificacionStockService.evaluarStockCritico(guardado);
+        return guardado;
     }
 
     public Producto actualizar(Long id, ProductoRequest request) {
@@ -85,7 +90,9 @@ public class ProductoService {
         }
         if (request.getStockMinimo() != null) existente.setStockMinimo(request.getStockMinimo());
         asignarRelaciones(existente, request);
-        return productoRepository.save(existente);
+        Producto guardado = productoRepository.save(existente);
+        notificacionStockService.evaluarStockCritico(guardado);
+        return guardado;
     }
 
     public void eliminar(Long id) {

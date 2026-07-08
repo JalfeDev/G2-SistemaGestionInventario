@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/usuarios/**", "/api/roles/**", "/api/categorias/**",
-                                "/api/unidades-medida/**", "/api/reportes/**")
+                                "/api/unidades-medida/**", "/api/reportes/**", "/api/notificaciones-stock/**")
                         .hasAnyRole("GERENTE", "ADMINISTRADOR")
                         .requestMatchers("/api/ingresos-inventario/**", "/api/detalles-ingreso/**",
                                 "/api/proveedores/**", "/api/proveedor-producto/**")
