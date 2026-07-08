@@ -13,4 +13,5 @@ public class UsuarioRequest {
     private String nombre;
     private String email;
     private Long rolId;
+    private Boolean activo;
 }

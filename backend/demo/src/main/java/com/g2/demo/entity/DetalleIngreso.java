@@ -31,6 +31,9 @@ public class DetalleIngreso {
     @Column(name = "costo_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal costoUnitario;
 
+    @Column(name = "costo_total", nullable = false, precision = 14, scale = 2, columnDefinition = "decimal(14,2) default 0")
+    private BigDecimal costoTotal = BigDecimal.ZERO;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_ingresoinv", nullable = false)
     private IngresoInventario ingresoInventario;

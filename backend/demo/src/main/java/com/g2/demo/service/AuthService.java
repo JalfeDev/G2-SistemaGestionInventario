@@ -1,6 +1,8 @@
 package com.g2.demo.service;
 
 import com.g2.demo.config.JwtUtil;
+import com.g2.demo.config.RevokedTokenService;
+import com.g2.demo.config.Roles;
 import com.g2.demo.dto.LoginRequest;
 import com.g2.demo.dto.LoginResponse;
 import com.g2.demo.dto.UsuarioResponse;
@@ -17,11 +19,14 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RevokedTokenService revokedTokenService;
 
-    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
+                       RevokedTokenService revokedTokenService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.revokedTokenService = revokedTokenService;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -31,6 +36,13 @@ public class AuthService {
 
         Usuario usuario = usuarioRepository.findByUsernameOrEmail(request.getUsuario(), request.getUsuario())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contrasena incorrectos"));
+
+        if (Boolean.FALSE.equals(usuario.getActivo())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "El usuario se encuentra desactivado");
+        }
+        if (usuario.getRol() == null || !Roles.VALIDOS.contains(usuario.getRol().getNombre())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "El usuario no tiene un rol autorizado");
+        }
 
         if (!passwordMatches(request.getContrasena(), usuario.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o contrasena incorrectos");
@@ -47,6 +59,12 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no encontrado"));
         return new UsuarioResponse(usuario);
+    }
+
+    public void logout(String token) {
+        if (token != null && jwtUtil.isValid(token)) {
+            revokedTokenService.revoke(token, jwtUtil.getExpirationEpochSeconds(token));
+        }
     }
 
     private boolean passwordMatches(String rawPassword, String storedPassword) {

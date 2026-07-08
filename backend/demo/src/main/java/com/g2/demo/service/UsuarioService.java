@@ -1,5 +1,6 @@
 package com.g2.demo.service;
 
+import com.g2.demo.config.Roles;
 import com.g2.demo.dto.UsuarioRequest;
 import com.g2.demo.dto.UsuarioResponse;
 import com.g2.demo.entity.Rol;
@@ -60,6 +61,7 @@ public class UsuarioService {
         usuario.setApellidos(request.getApellidos());
         usuario.setEmail(request.getEmail());
         usuario.setRol(rol);
+        usuario.setActivo(true);
 
         return new UsuarioResponse(usuarioRepository.save(usuario));
     }
@@ -87,6 +89,9 @@ public class UsuarioService {
         if (request.getRolId() != null) {
             usuario.setRol(obtenerRol(request.getRolId()));
         }
+        if (request.getActivo() != null) {
+            usuario.setActivo(request.getActivo());
+        }
 
         return new UsuarioResponse(usuarioRepository.save(usuario));
     }
@@ -96,6 +101,16 @@ public class UsuarioService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         Rol rol = obtenerRol(rolId);
         usuario.setRol(rol);
+        return new UsuarioResponse(usuarioRepository.save(usuario));
+    }
+
+    public UsuarioResponse actualizarActivo(Long id, Boolean activo) {
+        if (activo == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El estado activo es obligatorio");
+        }
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+        usuario.setActivo(activo);
         return new UsuarioResponse(usuarioRepository.save(usuario));
     }
 
@@ -110,8 +125,12 @@ public class UsuarioService {
         if (rolId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rolId es obligatorio");
         }
-        return rolRepository.findById(rolId)
+        Rol rol = rolRepository.findById(rolId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no encontrado"));
+        if (!Roles.VALIDOS.contains(rol.getNombre())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rol no permitido");
+        }
+        return rol;
     }
 
     private String resolveNombres(UsuarioRequest request) {

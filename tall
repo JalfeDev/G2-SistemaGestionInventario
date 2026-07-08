@@ -1,0 +1,16 @@
+warning: in the working copy of 'frontend/app/src/App.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/app/src/index.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/app/src/pages/Alertas.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/app/src/pages/Distribuciones.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/app/src/pages/Entradas.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/app/src/pages/Login.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/app/src/pages/Productos.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/app/src/services/api.js', LF will be replaced by CRLF the next time Git touches it
+frontend/app/src/App.jsx
+frontend/app/src/index.css
+frontend/app/src/pages/Alertas.jsx
+frontend/app/src/pages/Distribuciones.jsx
+frontend/app/src/pages/Entradas.jsx
+frontend/app/src/pages/Login.jsx
+frontend/app/src/pages/Productos.jsx
+frontend/app/src/services/api.js
