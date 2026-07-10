@@ -8,6 +8,7 @@ const navigation = [
   { path: 'usuarios', icon: 'users', label: 'Usuarios', roles: [ROLES.ADMINISTRADOR] },
   { path: 'productos', icon: 'box', label: 'Productos', roles: [ROLES.ADMINISTRADOR] },
   { path: 'configuracion', icon: 'clipboard', label: 'Configuracion', roles: [ROLES.ADMINISTRADOR] },
+  { path: 'importacion-csv', icon: 'upload', label: 'Importar CSV', roles: [ROLES.ADMINISTRADOR] },
   { path: 'reporte-consumo', icon: 'chart', label: 'Reportes', roles: [ROLES.GERENTE] },
   { path: 'alertas', icon: 'bell', label: 'Alertas', roles: [ROLES.GERENTE] },
   { path: 'entradas', icon: 'arrowDown', label: 'Entradas', roles: [ROLES.ENCARGADO_ALMACEN] },
