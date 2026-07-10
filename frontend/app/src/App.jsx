@@ -9,6 +9,7 @@ import Stock from './pages/Stock'
 import Alertas from './pages/Alertas'
 import ReporteConsumo from './pages/ReporteConsumo'
 import Configuracion from './pages/Configuracion'
+import ImportacionCsv from './pages/ImportacionCsv'
 import { defaultRouteForRole, getStoredUser, ROLES } from './utils/roles'
 
 const ADMINISTRADOR = [ROLES.ADMINISTRADOR]
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="/usuarios" element={<AllowedRoute roles={ADMINISTRADOR}><Usuarios /></AllowedRoute>} />
           <Route path="/reporte-consumo" element={<AllowedRoute roles={GERENTE}><ReporteConsumo /></AllowedRoute>} />
           <Route path="/configuracion" element={<AllowedRoute roles={ADMINISTRADOR}><Configuracion /></AllowedRoute>} />
+          <Route path="/importacion-csv" element={<AllowedRoute roles={ADMINISTRADOR}><ImportacionCsv /></AllowedRoute>} />
         </Route>
         <Route path="*" element={<Navigate to={localStorage.getItem('hotel_token') ? defaultRouteForRole(getStoredUser().rol) : '/login'} replace />} />
       </Routes>

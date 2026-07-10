@@ -12,16 +12,18 @@ export default function ImportacionCsv() {
   const unidades   = useApiResource(unidadService.listar,   fallbackUnidades)
 
   const [rows,      setRows]      = useState([])
+  const [file,      setFile]      = useState(null)
   const [filename,  setFilename]  = useState('')
   const [csvError,  setCsvError]  = useState('')
   const [importing, setImporting] = useState(false)
   const [resultado, setResultado] = useState(null)
 
-  // ── Leer y parsear el CSV localmente ──────────────────────────────────────
+  // ── Leer y previsualizar el CSV localmente (la importacion real la hace el backend) ──
   function readFile(event) {
-    const file = event.target.files?.[0]
-    if (!file) return
-    setFilename(file.name)
+    const selected = event.target.files?.[0]
+    if (!selected) return
+    setFile(selected)
+    setFilename(selected.name)
     setCsvError('')
     setResultado(null)
     setRows([])
@@ -46,37 +48,28 @@ export default function ImportacionCsv() {
       })
       setRows(parsed)
     }
-    reader.readAsText(file)
+    reader.readAsText(selected)
   }
 
-  // ── Importar al backend usando productoService.crear() por cada fila ──────
+  // ── Importar al backend: envia el archivo real a ProductoCsvFactory (HU-13) ──
   async function importar() {
-    if (rows.length === 0) return
+    if (!file) return
     setImporting(true)
     setResultado(null)
 
-    let exitosos = 0
-    const errores = []
-
-    for (const row of rows) {
-      try {
-        await productoService.crear({
-          nombre:      row.nombre,
-          stockActual: Number(row.stockActual || 0),
-          stockMinimo: Number(row.stockMinimo  || 0),
-          categoriaId: row.categoriaId ? Number(row.categoriaId) : null,
-          unidadId:    row.unidadId    ? Number(row.unidadId)    : null,
-        })
-        exitosos++
-      } catch (error) {
-        const msg = error?.response?.data?.message || 'Error desconocido'
-        errores.push({ linea: row.linea, nombre: row.nombre, msg })
+    try {
+      const { data } = await productoService.importarCsv(file)
+      setResultado({ exitosos: data.exitosos, errores: data.errores })
+      if (data.exitosos > 0) {
+        setRows([])
+        setFile(null)
+        setFilename('')
       }
+    } catch (error) {
+      setCsvError(error?.response?.data?.message || 'No se pudo importar el archivo.')
+    } finally {
+      setImporting(false)
     }
-
-    setImporting(false)
-    setResultado({ exitosos, errores })
-    if (exitosos > 0) setRows([])
   }
 
   return (
@@ -142,7 +135,7 @@ export default function ImportacionCsv() {
           {resultado.errores.length > 0 && (
             <ul style={{ marginTop: '8px' }}>
               {resultado.errores.map((e) => (
-                <li key={e.linea}>Línea {e.linea} — <strong>{e.nombre}</strong>: {e.msg}</li>
+                <li key={e.linea}>Línea {e.linea} — <strong>{e.nombre}</strong>: {e.mensaje}</li>
               ))}
             </ul>
           )}

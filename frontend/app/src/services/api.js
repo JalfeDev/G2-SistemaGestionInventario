@@ -52,6 +52,11 @@ export const authService = {
 export const productoService = {
   ...crud('/productos'),
   alertas: () => api.get('/productos/alertas'),
+  importarCsv: (archivo) => {
+    const formData = new FormData()
+    formData.append('archivo', archivo)
+    return api.post('/productos/importar-csv', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
 }
 
 export const proveedorService = crud('/proveedores')
