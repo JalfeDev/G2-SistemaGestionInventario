@@ -15,6 +15,10 @@ public class ReporteConsumoPdfService {
 
     private final PdfDocumentBuilder pdfDocumentBuilder;
 
+    public ReporteConsumoPdfService() {
+        this(new PdfDocumentBuilder());
+    }
+
     public ReporteConsumoPdfService(PdfDocumentBuilder pdfDocumentBuilder) {
         this.pdfDocumentBuilder = pdfDocumentBuilder;
     }
