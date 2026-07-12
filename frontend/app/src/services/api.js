@@ -92,6 +92,12 @@ export const reporteService = {
   consultar: (fechaInicio, fechaFin) => api.get('/reportes/consumo', { params: { fechaInicio, fechaFin } }),
   descargarPdf: (fechaInicio, fechaFin) => api.get('/reportes/consumo/pdf', { params: { fechaInicio, fechaFin }, responseType: 'blob' }),
 }
+export const reporteCostoProveedorService = {
+  consultar: (proveedorId, fechaInicio, fechaFin) =>
+    api.get('/reportes/costos-proveedor', { params: { proveedorId, fechaInicio, fechaFin } }),
+  descargarPdf: (proveedorId, fechaInicio, fechaFin) =>
+    api.get('/reportes/costos-proveedor/pdf', { params: { proveedorId, fechaInicio, fechaFin }, responseType: 'blob' }),
+}
 
 export function isCanceledRequest(error) {
   return axios.isCancel(error) || error?.code === 'ERR_CANCELED' || error?.name === 'AbortError'

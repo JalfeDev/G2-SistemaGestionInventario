@@ -10,9 +10,13 @@ const navigation = [
   { path: 'configuracion', icon: 'clipboard', label: 'Configuracion', roles: [ROLES.ADMINISTRADOR] },
   { path: 'importacion-csv', icon: 'upload', label: 'Importar CSV', roles: [ROLES.ADMINISTRADOR] },
   { path: 'reporte-consumo', icon: 'chart', label: 'Reportes', roles: [ROLES.GERENTE] },
+  { path: 'reporte-costos-proveedor', icon: 'chart', label: 'Costos por proveedor', roles: [ROLES.GERENTE] },
   { path: 'alertas', icon: 'bell', label: 'Alertas', roles: [ROLES.GERENTE] },
+  { path: 'dashboard', icon: 'chart', label: 'Dashboard', roles: [ROLES.GERENTE] },
   { path: 'entradas', icon: 'arrowDown', label: 'Entradas', roles: [ROLES.ENCARGADO_ALMACEN] },
   { path: 'stock', icon: 'box', label: 'Stock', roles: [ROLES.ENCARGADO_ALMACEN] },
+  { path: 'solicitudes', icon: 'clipboard', label: 'Solicitudes', roles: [ROLES.ENCARGADO_ALMACEN, ROLES.GERENTE] },
+  { path: 'historial-precios', icon: 'chart', label: 'Historial de precios', roles: [ROLES.ENCARGADO_ALMACEN, ROLES.GERENTE] },
   { path: 'distribuciones', icon: 'rooms', label: 'Distribuciones', roles: [ROLES.HOUSEKEEPER] },
 ]
 

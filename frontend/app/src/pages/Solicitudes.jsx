@@ -19,10 +19,16 @@ export default function Solicitudes() {
     if (localStorage.getItem('hotel_demo')) return setStatus({ tone: 'warning', text: 'Vista demo: la solicitud fue validada localmente. Inicia sesion para registrarla.' })
     try {
       const me = (await authService.me()).data
-      const request = (await solicitudService.crear({ estado: 'PENDIENTE', comentario: form.comentario, solicitante: { id: me.id } })).data
-      const detail = (await detalleSolicitudService.crear({ cantidadSolicitada: Number(form.cantidad), solicitud: { id: request.id }, producto: { id: Number(form.productoId) } })).data
-      requests.setData([request, ...requests.data])
-      details.setData([detail, ...details.data])
+      const payload = {
+        solicitanteId: me.id,
+        comentario: form.comentario,
+        detalles: [
+          { productoId: Number(form.productoId), cantidad: Number(form.cantidad) },
+        ],
+      }
+      await solicitudService.crear(payload)
+      requests.reload()
+      details.reload()
       setForm({ productoId: '', cantidad: '', comentario: '' })
       setOpen(false)
       setStatus({ tone: 'success', text: 'Solicitud de reabastecimiento registrada.' })

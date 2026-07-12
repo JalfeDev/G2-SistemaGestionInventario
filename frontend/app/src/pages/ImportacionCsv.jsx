@@ -6,7 +6,6 @@ import { fallbackCategorias, fallbackUnidades } from '../data/fallbackData'
 
 const COLUMNAS = ['nombre', 'stockMinimo']
 
-// Patrón Service Layer — todas las llamadas al backend pasan por los services de api.js
 export default function ImportacionCsv() {
   const categorias = useApiResource(categoriaService.listar, fallbackCategorias)
   const unidades   = useApiResource(unidadService.listar,   fallbackUnidades)
@@ -18,7 +17,6 @@ export default function ImportacionCsv() {
   const [importing, setImporting] = useState(false)
   const [resultado, setResultado] = useState(null)
 
-  // ── Leer y previsualizar el CSV localmente (la importacion real la hace el backend) ──
   function readFile(event) {
     const selected = event.target.files?.[0]
     if (!selected) return
@@ -51,7 +49,6 @@ export default function ImportacionCsv() {
     reader.readAsText(selected)
   }
 
-  // ── Importar al backend: envia el archivo real a ProductoCsvFactory (HU-13) ──
   async function importar() {
     if (!file) return
     setImporting(true)
