@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { Badge, Card, Field, Icon, Loader, Notice, PageHeader, ResourceNotice } from '../components/ui'
+import { useSearchParams } from 'react-router-dom'
+import { Badge, Card, Empty, Field, Icon, Loader, Notice, PageHeader, ResourceNotice } from '../components/ui'
 import { fallbackDetallesSolicitud, fallbackProductos, fallbackSolicitudes } from '../data/fallbackData'
 import { useApiResource } from '../hooks/useApiResource'
 import { authService, detalleSolicitudService, getApiError, productoService, solicitudService } from '../services/api'
@@ -9,48 +9,51 @@ import { ROLES } from '../utils/roles'
 
 export default function Solicitudes() {
   const [searchParams] = useSearchParams()
+  const productoInicial = searchParams.get('productoId') || ''
   const details = useApiResource(detalleSolicitudService.listar, fallbackDetallesSolicitud)
   const products = useApiResource(productoService.listar, fallbackProductos)
   const [me, setMe] = useState(null)
   const [requests, setRequests] = useState({ data: fallbackSolicitudes, loading: true, error: '' })
-  const [open, setOpen] = useState(false)
-  const [form, setForm] = useState({ productoId: '', cantidad: '', comentario: '' })
+  const [open, setOpen] = useState(Boolean(productoInicial))
+  const [form, setForm] = useState({ productoId: productoInicial, cantidad: '', comentario: '' })
   const [status, setStatus] = useState({ tone: '', text: '' })
   const [revisando, setRevisando] = useState(null)
   const [motivoRechazo, setMotivoRechazo] = useState('')
 
   useEffect(() => {
-    authService.me().then(({ data }) => setMe(data))
+    authService.me()
+      .then(({ data }) => setMe(data))
+      .catch((error) => setRequests({ data: fallbackSolicitudes, loading: false, error: getApiError(error) }))
   }, [])
 
-  useEffect(() => {
-    const productoId = searchParams.get('productoId')
-    if (productoId) {
-      setForm((prev) => ({ ...prev, productoId }))
-      setOpen(true)
-    }
-  }, [])
-
-  const cargarSolicitudes = useCallback(() => {
-    if (!me) return
+  const cargarSolicitudes = useCallback((usuario, cancelado = () => false) => {
+    if (!usuario) return Promise.resolve()
     setRequests((prev) => ({ ...prev, loading: true }))
-    const fetch = me.rol === ROLES.GERENTE
+    const fetch = usuario.rol === ROLES.GERENTE
       ? solicitudService.listar()
-      : solicitudService.listarPorUsuario(me.id)
-    fetch
-      .then(({ data }) => setRequests({ data, loading: false, error: '' }))
-      .catch((err) => setRequests({ data: fallbackSolicitudes, loading: false, error: getApiError(err) }))
-  }, [me])
+      : solicitudService.listarPorUsuario(usuario.id)
+    return fetch
+      .then(({ data }) => { if (!cancelado()) setRequests({ data, loading: false, error: '' }) })
+      .catch((err) => { if (!cancelado()) setRequests({ data: fallbackSolicitudes, loading: false, error: getApiError(err) }) })
+  }, [])
 
   useEffect(() => {
-    cargarSolicitudes()
-  }, [cargarSolicitudes])
+    if (!me) return undefined
+    let cancelado = false
+    const timer = window.setTimeout(() => cargarSolicitudes(me, () => cancelado), 0)
+    return () => {
+      cancelado = true
+      window.clearTimeout(timer)
+    }
+  }, [me, cargarSolicitudes])
 
   const esGerente = me?.rol === ROLES.GERENTE
+  const esAlmacen = me?.rol === ROLES.ENCARGADO_ALMACEN
 
   async function submit(event) {
     event.preventDefault()
     if (!form.productoId || !form.cantidad) return setStatus({ tone: 'danger', text: 'Selecciona un producto e indica la cantidad.' })
+    if (Number(form.cantidad) <= 0) return setStatus({ tone: 'danger', text: 'La cantidad debe ser mayor a cero.' })
     if (localStorage.getItem('hotel_demo')) return setStatus({ tone: 'warning', text: 'Vista demo: la solicitud fue validada localmente. Inicia sesion para registrarla.' })
     if (!me) return setStatus({ tone: 'danger', text: 'Cargando datos de usuario, intenta de nuevo.' })
     try {
@@ -60,7 +63,7 @@ export default function Solicitudes() {
         detalles: [{ productoId: Number(form.productoId), cantidad: Number(form.cantidad) }],
       }
       await solicitudService.crear(payload)
-      cargarSolicitudes()
+      await cargarSolicitudes(me)
       details.reload()
       setForm({ productoId: '', cantidad: '', comentario: '' })
       setOpen(false)
@@ -80,7 +83,7 @@ export default function Solicitudes() {
         estado: revisando.accion,
         comentario: revisando.accion === 'RECHAZADO' ? motivoRechazo : undefined,
       })
-      cargarSolicitudes()
+      await cargarSolicitudes(me)
       setRevisando(null)
       setMotivoRechazo('')
       setStatus({ tone: 'success', text: 'Solicitud actualizada.' })
@@ -91,10 +94,10 @@ export default function Solicitudes() {
 
   return (
     <>
-      <PageHeader title="Solicitudes de reabastecimiento" description="Gestiona pedidos de reposicion para mantener la operacion continua." actions={<button className="button primary" onClick={() => setOpen(!open)}><Icon name="plus" size={17} /> Nueva solicitud</button>} />
+      <PageHeader title="Solicitudes de reabastecimiento" description="Gestiona pedidos de reposicion para mantener la operacion continua." actions={esAlmacen && <button className="button primary" onClick={() => setOpen(!open)}><Icon name="plus" size={17} /> Nueva solicitud</button>} />
       <ResourceNotice error={requests.error || details.error || products.error} />
       {status.text && <Notice tone={status.tone}>{status.text}</Notice>}
-      {open && (
+      {open && esAlmacen && (
         <Card className="form-card">
           <div className="card-title"><div><span>Abastecimiento</span><h3>Crear solicitud</h3></div></div>
           <form className="form-grid" onSubmit={submit}>
@@ -131,7 +134,7 @@ export default function Solicitudes() {
         </Card>
       )}
       <Card>
-        {requests.loading ? <Loader /> : (
+        {requests.loading ? <Loader /> : requests.data.length === 0 ? <Empty text="No hay solicitudes para mostrar." /> : (
           <div className="table-wrap">
             <table>
               <thead>

@@ -18,6 +18,7 @@ import { defaultRouteForRole, getStoredUser, ROLES } from './utils/roles'
 
 const ADMINISTRADOR = [ROLES.ADMINISTRADOR]
 const GERENTE = [ROLES.GERENTE]
+const GERENTE_O_ADMIN = [ROLES.GERENTE, ROLES.ADMINISTRADOR]
 const ENCARGADO_ALMACEN = [ROLES.ENCARGADO_ALMACEN]
 const HOUSEKEEPER = [ROLES.HOUSEKEEPER]
 const ALMACEN_O_GERENTE = [ROLES.ENCARGADO_ALMACEN, ROLES.GERENTE]
@@ -38,7 +39,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route element={<ProtectedLayout />}>
           <Route path="/stock" element={<AllowedRoute roles={ENCARGADO_ALMACEN}><Stock /></AllowedRoute>} />
-          <Route path="/alertas" element={<AllowedRoute roles={GERENTE}><Alertas /></AllowedRoute>} />
+          <Route path="/alertas" element={<AllowedRoute roles={GERENTE_O_ADMIN}><Alertas /></AllowedRoute>} />
           <Route path="/productos" element={<AllowedRoute roles={ADMINISTRADOR}><Productos /></AllowedRoute>} />
           <Route path="/entradas" element={<AllowedRoute roles={ENCARGADO_ALMACEN}><Entradas /></AllowedRoute>} />
           <Route path="/distribuciones" element={<AllowedRoute roles={HOUSEKEEPER}><Distribuciones /></AllowedRoute>} />

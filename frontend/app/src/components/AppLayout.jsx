@@ -12,7 +12,7 @@ const navigation = [
   { path: 'importacion-csv', icon: 'upload', label: 'Importar CSV', roles: [ROLES.ADMINISTRADOR] },
   { path: 'reporte-consumo', icon: 'chart', label: 'Reportes', roles: [ROLES.GERENTE] },
   { path: 'reporte-costos-proveedor', icon: 'chart', label: 'Costos por proveedor', roles: [ROLES.GERENTE] },
-  { path: 'alertas', icon: 'bell', label: 'Alertas', roles: [ROLES.GERENTE] },
+  { path: 'alertas', icon: 'bell', label: 'Alertas', roles: [ROLES.GERENTE, ROLES.ADMINISTRADOR] },
   { path: 'dashboard', icon: 'chart', label: 'Dashboard', roles: [ROLES.GERENTE] },
   { path: 'entradas', icon: 'arrowDown', label: 'Entradas', roles: [ROLES.ENCARGADO_ALMACEN] },
   { path: 'stock', icon: 'box', label: 'Stock', roles: [ROLES.ENCARGADO_ALMACEN] },

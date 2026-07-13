@@ -11,11 +11,20 @@ export default function Dashboard() {
   const top = dashboard.data?.topProductosConsumidos30Dias || []
   const categorias = dashboard.data?.consumoPorCategoria30Dias || []
   const variaciones = dashboard.data?.variacionStock30Dias || []
+  const resumen = dashboard.data?.resumen
 
   return (
     <>
       <PageHeader title="Dashboard ejecutivo" description="Indicadores de consumo y variacion de stock de los ultimos 30 dias." actions={<span className="date-chip">Actualizado hoy</span>} />
       <ResourceNotice error={dashboard.error} />
+      {dashboard.loading ? <Loader /> : resumen && (
+        <div className="stats-grid">
+          <Card><div className="metric"><div className="metric-icon"><Icon name="box" size={20} /></div><div><span>Productos</span><strong>{resumen.totalProductos}</strong><small>Total registrados</small></div></div></Card>
+          <Card><div className="metric warning"><div className="metric-icon"><Icon name="warning" size={20} /></div><div><span>Stock bajo</span><strong>{resumen.productosStockBajo}</strong><small>Requieren atencion</small></div></div></Card>
+          <Card><div className="metric"><div className="metric-icon"><Icon name="clipboard" size={20} /></div><div><span>Solicitudes</span><strong>{resumen.solicitudesPendientes}</strong><small>Pendientes</small></div></div></Card>
+          <Card><div className="metric danger"><div className="metric-icon"><Icon name="bell" size={20} /></div><div><span>Notificaciones</span><strong>{resumen.notificacionesStockActivas}</strong><small>Stock critico activo</small></div></div></Card>
+        </div>
+      )}
       <div className="dashboard-grid">
         <Card>
           <div className="card-title"><div><span>Consumo</span><h3>Top 5 productos mas consumidos (30 dias)</h3></div></div>

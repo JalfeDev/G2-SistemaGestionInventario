@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card, Empty, Field, Loader, Notice, PageHeader } from '../components/ui'
 import { fallbackProductos, fallbackProveedores } from '../data/fallbackData'
 import { useApiResource } from '../hooks/useApiResource'
@@ -13,16 +13,23 @@ export default function HistorialPrecios() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    let cancelado = false
+  const consultarHistorial = useCallback((cancelado = () => false) => {
     setLoading(true)
     setError('')
-    historialPreciosService.consultar(filtros.productoId || undefined, filtros.proveedorId || undefined)
-      .then(({ data }) => { if (!cancelado) setHistorial(data) })
-      .catch((requestError) => { if (!cancelado) setError(getApiError(requestError)) })
-      .finally(() => { if (!cancelado) setLoading(false) })
-    return () => { cancelado = true }
+    return historialPreciosService.consultar(filtros.productoId || undefined, filtros.proveedorId || undefined)
+      .then(({ data }) => { if (!cancelado()) setHistorial(data) })
+      .catch((requestError) => { if (!cancelado()) setError(getApiError(requestError)) })
+      .finally(() => { if (!cancelado()) setLoading(false) })
   }, [filtros.productoId, filtros.proveedorId])
+
+  useEffect(() => {
+    let cancelado = false
+    const timer = window.setTimeout(() => consultarHistorial(() => cancelado), 0)
+    return () => {
+      cancelado = true
+      window.clearTimeout(timer)
+    }
+  }, [consultarHistorial])
 
   return (
     <>
@@ -47,7 +54,7 @@ export default function HistorialPrecios() {
       {loading ? <Loader /> : historial && (
         <>
           <Card><div className="card-title"><h3>Precio promedio</h3><strong>{money(historial.precioPromedio)}</strong></div></Card>
-          <Card>{historial.historial.length === 0 ? <Empty /> : <div className="table-wrap"><table><thead><tr><th>Fecha de ingreso</th><th>Producto</th><th>Proveedor</th><th>Cantidad</th><th>Costo unitario</th><th>Total</th></tr></thead><tbody>{historial.historial.map((item, index) => <tr key={index}><td>{formatDate(item.fecha)}</td><td><strong>{item.producto}</strong></td><td>{item.proveedor}</td><td>{item.cantidad}</td><td>{money(item.costoUnitario)}</td><td><strong>{money(item.costoTotal)}</strong></td></tr>)}</tbody></table></div>}</Card>
+          <Card>{historial.historial.length === 0 ? <Empty text="No hay precios registrados para los filtros seleccionados." /> : <div className="table-wrap"><table><thead><tr><th>Fecha de ingreso</th><th>Producto</th><th>Proveedor</th><th>Cantidad</th><th>Costo unitario</th><th>Total</th></tr></thead><tbody>{historial.historial.map((item, index) => <tr key={index}><td>{formatDate(item.fecha)}</td><td><strong>{item.producto}</strong></td><td>{item.proveedor}</td><td>{item.cantidad}</td><td>{money(item.costoUnitario)}</td><td><strong>{money(item.costoTotal)}</strong></td></tr>)}</tbody></table></div>}</Card>
         </>
       )}
     </>

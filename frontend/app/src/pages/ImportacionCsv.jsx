@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Card, Empty, Icon, Loader, Notice, PageHeader } from '../components/ui'
-import { productoService } from '../services/api'
+import { getApiError, importacionCsvService } from '../services/api'
 
 const COLUMNAS = ['nombre', 'stockMinimo']
 
@@ -15,6 +15,15 @@ export default function ImportacionCsv() {
   function readFile(event) {
     const selected = event.target.files?.[0]
     if (!selected) return
+    if (!selected.name.toLowerCase().endsWith('.csv')) {
+      setFile(null)
+      setFilename('')
+      setRows([])
+      setResultado(null)
+      setCsvError('Selecciona un archivo con extension .csv.')
+      event.target.value = ''
+      return
+    }
     setFile(selected)
     setFilename(selected.name)
     setCsvError('')
@@ -58,20 +67,23 @@ export default function ImportacionCsv() {
   }
 
   async function importar() {
-    if (!file) return
+    if (!file) {
+      setCsvError('Selecciona un archivo CSV antes de importar.')
+      return
+    }
     setImporting(true)
     setResultado(null)
 
     try {
-      const { data } = await productoService.importarCsv(file)
-      setResultado({ exitosos: data.exitosos, errores: data.errores })
-      if (data.exitosos > 0) {
+      const { data } = await importacionCsvService.importar(file)
+      setResultado({ totalFilas: data.totalFilas || 0, exitosos: data.exitosos || 0, errores: data.errores || [] })
+      if ((data.exitosos || 0) > 0 && (data.errores || []).length === 0) {
         setRows([])
         setFile(null)
         setFilename('')
       }
     } catch (error) {
-      setCsvError(error?.response?.data?.message || 'No se pudo importar el archivo.')
+      setCsvError(getApiError(error, 'No se pudo importar el archivo.'))
     } finally {
       setImporting(false)
     }
@@ -104,6 +116,7 @@ export default function ImportacionCsv() {
       {resultado && (
         <Notice tone={resultado.errores.length === 0 ? 'success' : 'warning'}>
           <strong>{resultado.exitosos} producto{resultado.exitosos !== 1 ? 's' : ''} importado{resultado.exitosos !== 1 ? 's' : ''} correctamente.</strong>
+          <p>{resultado.totalFilas} fila{resultado.totalFilas !== 1 ? 's' : ''} procesada{resultado.totalFilas !== 1 ? 's' : ''}; {resultado.errores.length} rechazada{resultado.errores.length !== 1 ? 's' : ''}.</p>
           {resultado.errores.length > 0 && (
             <ul style={{ marginTop: '8px' }}>
               {resultado.errores.map((e) => (

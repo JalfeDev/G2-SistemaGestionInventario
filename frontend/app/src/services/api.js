@@ -58,6 +58,9 @@ export const productoService = {
     return api.post('/productos/importar-csv', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
 }
+export const importacionCsvService = {
+  importar: (archivo) => productoService.importarCsv(archivo),
+}
 
 export const proveedorService = crud('/proveedores')
 export const proveedorProductoService = crud('/proveedor-producto')
@@ -76,6 +79,7 @@ export const solicitudService = {
   listarPorUsuario: (usuarioId) => api.get(`/solicitudes-compra/usuario/${usuarioId}`),
   revisar: (id, payload) => api.put(`/solicitudes-compra/${id}/revisar`, payload),
 }
+export const solicitudReabastecimientoService = solicitudService
 export const detalleSolicitudService = crud('/detalles-solicitud')
 export const notificacionService = crud('/notificaciones')
 export const notificacionStockService = {
@@ -102,6 +106,7 @@ export const reporteCostoProveedorService = {
   descargarPdf: (proveedorId, fechaInicio, fechaFin) =>
     api.get('/reportes/costos-proveedor/pdf', { params: { proveedorId, fechaInicio, fechaFin }, responseType: 'blob' }),
 }
+export const reporteCostosProveedorService = reporteCostoProveedorService
 export const dashboardService = {
   consultar: () => api.get('/dashboard'),
 }
