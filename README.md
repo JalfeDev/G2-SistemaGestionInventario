@@ -439,7 +439,7 @@ Como gerente, quiero consultar el gasto realizado por proveedor y descargar el r
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Fabricio Carreño |
+| Assignee | Sebastian García |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P1 |
 | Size | M |
