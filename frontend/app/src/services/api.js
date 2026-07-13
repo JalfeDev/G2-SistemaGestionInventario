@@ -71,7 +71,11 @@ export const distribucionService = {
   registrar: (data) => api.post('/distribuciones-insumos', data),
 }
 export const detalleDistribucionService = crud('/detalles-distribucion')
-export const solicitudService = crud('/solicitudes-compra')
+export const solicitudService = {
+  ...crud('/solicitudes-compra'),
+  listarPorUsuario: (usuarioId) => api.get(`/solicitudes-compra/usuario/${usuarioId}`),
+  revisar: (id, payload) => api.put(`/solicitudes-compra/${id}/revisar`, payload),
+}
 export const detalleSolicitudService = crud('/detalles-solicitud')
 export const notificacionService = crud('/notificaciones')
 export const notificacionStockService = {

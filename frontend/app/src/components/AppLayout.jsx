@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { authService } from '../services/api'
+import { useApiResource } from '../hooks/useApiResource'
+import { authService, productoService } from '../services/api'
 import { getStoredUser, roleLabel, ROLES } from '../utils/roles'
 import { Icon } from './ui'
 
@@ -24,6 +25,7 @@ export default function AppLayout() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const user = getStoredUser()
+  const alertasActivas = useApiResource(productoService.alertas)
 
   async function logout() {
     try {
@@ -47,6 +49,7 @@ export default function AppLayout() {
           {navigation.filter((item) => item.roles.includes(user.rol)).map((item) => (
             <NavLink key={item.path} to={`/${item.path}`} onClick={() => setOpen(false)} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
               <Icon name={item.icon} size={18} /><span>{item.label}</span>
+              {item.path === 'alertas' && alertasActivas.data.length > 0 && <span className="badge badge-danger">{alertasActivas.data.length}</span>}
             </NavLink>
           ))}
         </nav>

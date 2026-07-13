@@ -1,3 +1,4 @@
+import BarChart from '../components/BarChart'
 import { Card, Empty, Icon, Loader, PageHeader, ResourceNotice } from '../components/ui'
 import { useApiResource } from '../hooks/useApiResource'
 import { dashboardService, notificacionStockService } from '../services/api'
@@ -22,7 +23,7 @@ export default function Dashboard() {
         </Card>
         <Card>
           <div className="card-title"><div><span>Consumo</span><h3>Consumo por categoria (30 dias)</h3></div></div>
-          {dashboard.loading ? <Loader /> : categorias.length === 0 ? <Empty text="Sin consumo registrado en los ultimos 30 dias." /> : <div className="table-wrap"><table><thead><tr><th>Categoria</th><th>Cantidad consumida</th></tr></thead><tbody>{categorias.map((item) => <tr key={item.categoria}><td><strong>{item.categoria}</strong></td><td>{item.cantidadConsumida}</td></tr>)}</tbody></table></div>}
+          {dashboard.loading ? <Loader /> : <BarChart data={categorias.map((item) => ({ label: item.categoria, value: Number(item.cantidadConsumida) }))} />}
         </Card>
       </div>
       <Card>

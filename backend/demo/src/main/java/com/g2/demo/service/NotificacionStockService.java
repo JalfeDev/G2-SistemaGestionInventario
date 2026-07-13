@@ -28,17 +28,20 @@ public class NotificacionStockService {
     private final boolean envioHabilitado;
     private final String emailEncargado;
     private final String emailGerente;
+    private final String frontendUrl;
 
     public NotificacionStockService(NotificacionStockRepository repository,
                                     JavaMailSender mailSender,
                                     @Value("${app.notifications.stock.enabled:false}") boolean envioHabilitado,
                                     @Value("${app.notifications.stock.email-encargado:}") String emailEncargado,
-                                    @Value("${app.notifications.stock.email-gerente:}") String emailGerente) {
+                                    @Value("${app.notifications.stock.email-gerente:}") String emailGerente,
+                                    @Value("${app.frontend-url:http://localhost:5173}") String frontendUrl) {
         this.repository = repository;
         this.mailSender = mailSender;
         this.envioHabilitado = envioHabilitado;
         this.emailEncargado = emailEncargado;
         this.emailGerente = emailGerente;
+        this.frontendUrl = frontendUrl;
     }
 
     public List<NotificacionStock> listar() {
@@ -141,6 +144,7 @@ public class NotificacionStockService {
                 + "Stock actual: " + notificacion.getStockActual() + "\n"
                 + "Stock minimo: " + notificacion.getStockMinimo() + "\n"
                 + "Fecha/hora de deteccion: " + notificacion.getFechaEnvio() + "\n\n"
-                + "El producto requiere revision o reposicion.";
+                + "El producto requiere revision o reposicion."
+                + "\n\nRevisa y gestiona la reposicion aqui: " + frontendUrl + "/solicitudes";
     }
 }

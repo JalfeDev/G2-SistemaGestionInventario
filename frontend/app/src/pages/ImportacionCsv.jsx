@@ -44,6 +44,19 @@ export default function ImportacionCsv() {
     reader.readAsText(selected)
   }
 
+  function descargarPlantilla() {
+    const contenido = 'nombre,stockActual,stockMinimo,categoria,unidad\nShampoo,20,5,Amenidades,Unidad\nToallas,50,10,Lenceria,Unidad\n'
+    const blob = new Blob([contenido], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'plantilla-productos.csv'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   async function importar() {
     if (!file) return
     setImporting(true)
@@ -77,6 +90,7 @@ export default function ImportacionCsv() {
         <h3>Selecciona un archivo CSV</h3>
         <p>Columnas: <strong>nombre</strong>, stockActual, <strong>stockMinimo</strong>, categoria, unidad</p>
         <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Obligatorias en negrita. Usa el nombre real de la categoria y la unidad de medida (ej. Amenidades, Unidad).</p>
+        <button className="button subtle" onClick={descargarPlantilla}>Descargar plantilla</button>
         <label className="button primary file-button">
           Elegir archivo
           <input type="file" accept=".csv,text/csv" onChange={readFile} />
