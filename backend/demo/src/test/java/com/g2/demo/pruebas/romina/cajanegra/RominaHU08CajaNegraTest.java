@@ -53,8 +53,8 @@ class RominaHU08CajaNegraTest {
     }
 
     @Test
-    void cn2_stockDebajoDelMinimoApareceEnAlertas() {
-        when(productoRepository.findAll()).thenReturn(List.of(producto("Papel higienico", "5", "10")));
+    void cn2_stockUnPuntoDebajoDelMinimoApareceEnAlertas() {
+        when(productoRepository.findAll()).thenReturn(List.of(producto("Papel higienico", "9", "10")));
 
         List<Producto> alertas = service.listarAlertas();
 
@@ -63,8 +63,8 @@ class RominaHU08CajaNegraTest {
     }
 
     @Test
-    void cn3_stockEncimaDelMinimoNoApareceEnAlertas() {
-        when(productoRepository.findAll()).thenReturn(List.of(producto("Champu", "15", "10")));
+    void cn3_stockUnPuntoEncimaDelMinimoNoApareceEnAlertas() {
+        when(productoRepository.findAll()).thenReturn(List.of(producto("Champu", "11", "10")));
 
         List<Producto> alertas = service.listarAlertas();
 
@@ -81,6 +81,15 @@ class RominaHU08CajaNegraTest {
 
         assertEquals("Sabanas", alertas.get(0).getNombre());
         assertEquals("Toallas", alertas.get(1).getNombre());
+    }
+
+    @Test
+    void cn5_sinProductosRegistradosNoHayAlertas() {
+        when(productoRepository.findAll()).thenReturn(List.of());
+
+        List<Producto> alertas = service.listarAlertas();
+
+        assertTrue(alertas.isEmpty());
     }
 
     private Producto producto(String nombre, String stockActual, String stockMinimo) {

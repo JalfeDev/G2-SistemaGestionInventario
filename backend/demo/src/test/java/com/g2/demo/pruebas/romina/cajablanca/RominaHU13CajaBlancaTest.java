@@ -100,4 +100,27 @@ class RominaHU13CajaBlancaTest {
         assertThrows(IllegalArgumentException.class,
                 () -> ProductoCsvFactory.crearDesdeFila(fila, categoriaRepository, unidadMedidaRepository));
     }
+
+    @Test
+    void caminoC6_stockMinimoNoNumericoLanzaExcepcion() {
+        Map<String, String> fila = new HashMap<>();
+        fila.put("nombre", "Producto");
+        fila.put("stockMinimo", "abc");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> ProductoCsvFactory.crearDesdeFila(fila, categoriaRepository, unidadMedidaRepository));
+    }
+
+    @Test
+    void caminoC7_categoriaYUnidadAusentesResuelvenANuloSinExcepcion() {
+        Map<String, String> fila = new HashMap<>();
+        fila.put("nombre", "Producto sin catalogar");
+
+        ProductoRequest request = ProductoCsvFactory.crearDesdeFila(fila, categoriaRepository, unidadMedidaRepository);
+
+        assertEquals(null, request.getCategoriaId());
+        assertEquals(null, request.getUnidadId());
+        assertEquals(0, BigDecimal.ZERO.compareTo(request.getStockActual()));
+        assertEquals(0, BigDecimal.ZERO.compareTo(request.getStockMinimo()));
+    }
 }

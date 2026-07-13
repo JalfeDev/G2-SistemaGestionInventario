@@ -99,6 +99,30 @@ class RominaHU05UnitariasTest {
         verify(productoRepository, never()).save(any());
     }
 
+    @Test
+    void crearProductoConStockActualNegativoLanzaExcepcion() {
+        ProductoRequest request = request("Toallas", "-1", "5", 1L, 2L);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> service.crear(request));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("El stock actual no puede ser negativo", exception.getReason());
+        verify(productoRepository, never()).save(any());
+    }
+
+    @Test
+    void crearProductoConStockMinimoNegativoLanzaExcepcion() {
+        ProductoRequest request = request("Toallas", "20", "-1", 1L, 2L);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> service.crear(request));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("El stock minimo no puede ser negativo", exception.getReason());
+        verify(productoRepository, never()).save(any());
+    }
+
     private ProductoRequest request(String nombre, String stockActual, String stockMinimo, Long categoriaId, Long unidadId) {
         ProductoRequest request = new ProductoRequest();
         request.setNombre(nombre);
