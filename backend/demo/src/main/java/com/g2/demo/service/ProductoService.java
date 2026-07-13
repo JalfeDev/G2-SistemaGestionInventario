@@ -188,7 +188,7 @@ public class ProductoService {
                 }
 
                 try {
-                    crear(ProductoCsvFactory.crearDesdeFila(fila));
+                    crear(ProductoCsvFactory.crearDesdeFila(fila, categoriaRepository, unidadMedidaRepository));
                     resultado.setExitosos(resultado.getExitosos() + 1);
                 } catch (IllegalArgumentException | ResponseStatusException e) {
                     String mensaje = e instanceof ResponseStatusException rse ? rse.getReason() : e.getMessage();

@@ -1,15 +1,10 @@
 import { useState } from 'react'
 import { Card, Empty, Icon, Loader, Notice, PageHeader } from '../components/ui'
-import { categoriaService, productoService, unidadService } from '../services/api'
-import { useApiResource } from '../hooks/useApiResource'
-import { fallbackCategorias, fallbackUnidades } from '../data/fallbackData'
+import { productoService } from '../services/api'
 
 const COLUMNAS = ['nombre', 'stockMinimo']
 
 export default function ImportacionCsv() {
-  const categorias = useApiResource(categoriaService.listar, fallbackCategorias)
-  const unidades   = useApiResource(unidadService.listar,   fallbackUnidades)
-
   const [rows,      setRows]      = useState([])
   const [file,      setFile]      = useState(null)
   const [filename,  setFilename]  = useState('')
@@ -76,46 +71,12 @@ export default function ImportacionCsv() {
         description="Carga lotes de productos desde un archivo CSV al catálogo del sistema."
       />
 
-      {/* Referencia de IDs disponibles */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-        <Card>
-          <div className="card-title"><div><span>Referencia</span><h3>Categorías disponibles</h3></div></div>
-          {categorias.loading ? <Loader rows={2} /> : (
-            <div className="table-wrap">
-              <table>
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
-                <tbody>
-                  {categorias.data.map((c) => (
-                    <tr key={c.id}><td><strong>{c.id}</strong></td><td>{c.nombre}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-        <Card>
-          <div className="card-title"><div><span>Referencia</span><h3>Unidades disponibles</h3></div></div>
-          {unidades.loading ? <Loader rows={2} /> : (
-            <div className="table-wrap">
-              <table>
-                <thead><tr><th>ID</th><th>Nombre</th><th>Abrev.</th></tr></thead>
-                <tbody>
-                  {unidades.data.map((u) => (
-                    <tr key={u.id}><td><strong>{u.id}</strong></td><td>{u.nombre}</td><td>{u.abreviatura}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-      </div>
-
       {/* Upload */}
       <Card className="upload-card">
         <div className="upload-icon"><Icon name="upload" size={28} /></div>
         <h3>Selecciona un archivo CSV</h3>
-        <p>Columnas: <strong>nombre</strong>, stockActual, <strong>stockMinimo</strong>, categoriaId, unidadId</p>
-        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Obligatorias en negrita. Usa los IDs de las tablas de referencia.</p>
+        <p>Columnas: <strong>nombre</strong>, stockActual, <strong>stockMinimo</strong>, categoria, unidad</p>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Obligatorias en negrita. Usa el nombre real de la categoria y la unidad de medida (ej. Amenidades, Unidad).</p>
         <label className="button primary file-button">
           Elegir archivo
           <input type="file" accept=".csv,text/csv" onChange={readFile} />
@@ -154,8 +115,8 @@ export default function ImportacionCsv() {
                   <th>Nombre</th>
                   <th>Stock actual</th>
                   <th>Stock mínimo</th>
-                  <th>Categoría ID</th>
-                  <th>Unidad ID</th>
+                  <th>Categoría</th>
+                  <th>Unidad</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,8 +126,8 @@ export default function ImportacionCsv() {
                     <td><strong>{row.nombre}</strong></td>
                     <td>{row.stockActual || '0'}</td>
                     <td>{row.stockMinimo}</td>
-                    <td>{row.categoriaId || '-'}</td>
-                    <td>{row.unidadId    || '-'}</td>
+                    <td>{row.categoria || '-'}</td>
+                    <td>{row.unidad    || '-'}</td>
                   </tr>
                 ))}
               </tbody>

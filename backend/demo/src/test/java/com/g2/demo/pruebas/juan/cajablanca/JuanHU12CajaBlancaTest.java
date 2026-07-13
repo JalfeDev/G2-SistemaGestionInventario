@@ -39,6 +39,9 @@ class JuanHU12CajaBlancaTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
                 List.of());
         when(dashboardService.obtenerDashboard()).thenReturn(dashboardEsperado);
 

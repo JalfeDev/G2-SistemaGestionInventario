@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class NotificacionStockService {
@@ -25,16 +26,19 @@ public class NotificacionStockService {
     private final NotificacionStockRepository repository;
     private final JavaMailSender mailSender;
     private final boolean envioHabilitado;
-    private final String emailDestino;
+    private final String emailEncargado;
+    private final String emailGerente;
 
     public NotificacionStockService(NotificacionStockRepository repository,
                                     JavaMailSender mailSender,
                                     @Value("${app.notifications.stock.enabled:false}") boolean envioHabilitado,
-                                    @Value("${app.notifications.stock.email-destino:}") String emailDestino) {
+                                    @Value("${app.notifications.stock.email-encargado:}") String emailEncargado,
+                                    @Value("${app.notifications.stock.email-gerente:}") String emailGerente) {
         this.repository = repository;
         this.mailSender = mailSender;
         this.envioHabilitado = envioHabilitado;
-        this.emailDestino = emailDestino;
+        this.emailEncargado = emailEncargado;
+        this.emailGerente = emailGerente;
     }
 
     public List<NotificacionStock> listar() {
@@ -103,7 +107,10 @@ public class NotificacionStockService {
                     notificacion.getProducto().getNombre());
             return;
         }
-        if (emailDestino == null || emailDestino.isBlank()) {
+        String[] destinatarios = Stream.of(emailEncargado, emailGerente)
+                .filter(email -> email != null && !email.isBlank())
+                .toArray(String[]::new);
+        if (destinatarios.length == 0) {
             notificacion.setMensajeError("Destinatario de correo no configurado.");
             log.warn("Stock critico detectado, pero no hay email destino configurado.");
             return;
@@ -111,7 +118,7 @@ public class NotificacionStockService {
 
         try {
             SimpleMailMessage mensaje = new SimpleMailMessage();
-            mensaje.setTo(emailDestino);
+            mensaje.setTo(destinatarios);
             mensaje.setSubject("Alerta de stock critico - " + notificacion.getProducto().getNombre());
             mensaje.setText(construirMensaje(notificacion));
             mailSender.send(mensaje);

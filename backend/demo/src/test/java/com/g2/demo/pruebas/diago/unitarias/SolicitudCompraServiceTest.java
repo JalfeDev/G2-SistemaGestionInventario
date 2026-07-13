@@ -9,12 +9,14 @@ import com.g2.demo.facade.SolicitudCompraFacade;
 import com.g2.demo.repository.SolicitudCompraRepository;
 import com.g2.demo.repository.UsuarioRepository;
 import com.g2.demo.service.SolicitudCompraService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -32,9 +34,16 @@ class SolicitudCompraServiceTest {
     @Mock private SolicitudCompraRepository solicitudCompraRepository;
     @Mock private SolicitudCompraFacade solicitudCompraFacade;
     @Mock private UsuarioRepository usuarioRepository;
+    @Mock private JavaMailSender mailSender;
 
-    @InjectMocks
     private SolicitudCompraService solicitudCompraService;
+
+    @BeforeEach
+    void setUp() {
+        solicitudCompraService = new SolicitudCompraService(
+                solicitudCompraRepository, solicitudCompraFacade, usuarioRepository,
+                mailSender, false, "");
+    }
 
     // 1. crear con detalles válidos delega al Facade
     @Test
@@ -116,5 +125,63 @@ class SolicitudCompraServiceTest {
 
         assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         verify(solicitudCompraRepository, never()).save(any());
+    }
+
+    // 5. con notificaciones habilitadas, se envia el correo al aprobar
+    @Test
+    void revisar_conNotificacionesHabilitadas_enviaCorreoAlSolicitante() {
+        Usuario solicitante = new Usuario();
+        solicitante.setEmail("almacen@hotelpiramide.pe");
+        SolicitudCompra pendiente = new SolicitudCompra();
+        pendiente.setId(1L);
+        pendiente.setEstado("PENDIENTE");
+        pendiente.setSolicitante(solicitante);
+
+        Usuario gerente = new Usuario();
+        gerente.setId(2L);
+
+        SolicitudCompraService service = new SolicitudCompraService(
+                solicitudCompraRepository, solicitudCompraFacade, usuarioRepository,
+                mailSender, true, "");
+
+        when(solicitudCompraRepository.findById(1L)).thenReturn(Optional.of(pendiente));
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(gerente));
+        when(solicitudCompraRepository.save(any(SolicitudCompra.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        RevisionSolicitudRequest request = new RevisionSolicitudRequest();
+        request.setAprobadorId(2L);
+        request.setEstado("APROBADO");
+
+        service.revisar(1L, request);
+
+        verify(mailSender).send(any(SimpleMailMessage.class));
+    }
+
+    // 6. con notificaciones deshabilitadas, no se envia correo
+    @Test
+    void revisar_conNotificacionesDeshabilitadas_noEnviaCorreo() {
+        Usuario solicitante = new Usuario();
+        solicitante.setEmail("almacen@hotelpiramide.pe");
+        SolicitudCompra pendiente = new SolicitudCompra();
+        pendiente.setId(1L);
+        pendiente.setEstado("PENDIENTE");
+        pendiente.setSolicitante(solicitante);
+
+        Usuario gerente = new Usuario();
+        gerente.setId(2L);
+
+        when(solicitudCompraRepository.findById(1L)).thenReturn(Optional.of(pendiente));
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(gerente));
+        when(solicitudCompraRepository.save(any(SolicitudCompra.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        RevisionSolicitudRequest request = new RevisionSolicitudRequest();
+        request.setAprobadorId(2L);
+        request.setEstado("APROBADO");
+
+        solicitudCompraService.revisar(1L, request);
+
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 }

@@ -18,6 +18,9 @@ public class DashboardDTO {
     private List<MovimientosTipo> movimientosPorTipo;
     private List<ProductoStockBajo> productosStockBajo;
     private List<MovimientoReciente> movimientosRecientes;
+    private List<ProductoConsumoDTO> topProductosConsumidos30Dias;
+    private List<CategoriaConsumoDTO> consumoPorCategoria30Dias;
+    private List<VariacionStockDTO> variacionStock30Dias;
 
     @Getter
     @AllArgsConstructor
@@ -73,5 +76,31 @@ public class DashboardDTO {
         private BigDecimal stockAnterior;
         private BigDecimal stockNuevo;
         private LocalDateTime fechaMovimiento;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class ProductoConsumoDTO {
+        private Long idProducto;
+        private String producto;
+        private BigDecimal cantidadConsumida;
+        private String unidad;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class CategoriaConsumoDTO {
+        private String categoria;
+        private BigDecimal cantidadConsumida;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class VariacionStockDTO {
+        private Long idProducto;
+        private String producto;
+        private BigDecimal stockActual;
+        private BigDecimal stockHaceTreintaDias;
+        private BigDecimal variacionStock;
     }
 }

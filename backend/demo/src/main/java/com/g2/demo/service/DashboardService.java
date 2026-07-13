@@ -22,6 +22,10 @@ import java.util.stream.Collectors;
 @Service
 public class DashboardService {
 
+    private static final int DIAS_VENTANA_CONSUMO = 30;
+    private static final String TIPO_ENTRADA = "ENTRADA";
+    private static final String TIPO_SALIDA = "SALIDA";
+
     private final ProductoRepository productoRepository;
     private final SolicitudCompraRepository solicitudCompraRepository;
     private final MovimientoInventarioRepository movimientoInventarioRepository;
@@ -52,6 +56,14 @@ public class DashboardService {
                 notificaciones.stream().filter(n -> Boolean.FALSE.equals(n.getResuelta())).count()
         );
 
+        LocalDateTime finVentana = LocalDateTime.now();
+        LocalDateTime inicioVentana = finVentana.minusDays(DIAS_VENTANA_CONSUMO);
+        List<MovimientoInventario> salidas30Dias = movimientoInventarioRepository
+                .findByTipoMovimientoAndFechaMovimientoGreaterThanEqualAndFechaMovimientoLessThanOrderByFechaMovimientoAsc(
+                        TIPO_SALIDA, inicioVentana, finVentana);
+        List<MovimientoInventario> movimientos30Dias = movimientoInventarioRepository
+                .findByFechaMovimientoGreaterThanEqualAndFechaMovimientoLessThan(inicioVentana, finVentana);
+
         return new DashboardDTO(
                 LocalDateTime.now(),
                 resumen,
@@ -59,8 +71,79 @@ public class DashboardService {
                 obtenerSolicitudesPorEstado(solicitudes),
                 obtenerMovimientosPorTipo(movimientos),
                 productosStockBajo,
-                obtenerMovimientosRecientes(movimientos)
+                obtenerMovimientosRecientes(movimientos),
+                obtenerTopProductosConsumidos(salidas30Dias),
+                obtenerConsumoPorCategoria(salidas30Dias),
+                obtenerVariacionStock(productos, movimientos30Dias)
         );
+    }
+
+    private List<DashboardDTO.ProductoConsumoDTO> obtenerTopProductosConsumidos(List<MovimientoInventario> salidas) {
+        Map<Long, ProductoConsumoAcumulado> acumulado = new LinkedHashMap<>();
+        for (MovimientoInventario movimiento : salidas) {
+            Producto producto = movimiento.getProducto();
+            acumulado.computeIfAbsent(producto.getId(), id -> new ProductoConsumoAcumulado(producto))
+                    .sumar(movimiento.getCantidad());
+        }
+        return acumulado.values().stream()
+                .sorted(Comparator.comparing((ProductoConsumoAcumulado a) -> a.cantidad).reversed())
+                .limit(5)
+                .map(a -> new DashboardDTO.ProductoConsumoDTO(
+                        a.producto.getId(),
+                        a.producto.getNombre(),
+                        a.cantidad,
+                        a.producto.getUnidad() != null ? a.producto.getUnidad().getNombre() : "Sin unidad"))
+                .toList();
+    }
+
+    private List<DashboardDTO.CategoriaConsumoDTO> obtenerConsumoPorCategoria(List<MovimientoInventario> salidas) {
+        Map<String, BigDecimal> acumulado = new LinkedHashMap<>();
+        for (MovimientoInventario movimiento : salidas) {
+            String categoria = nombreCategoria(movimiento.getProducto());
+            acumulado.merge(categoria, movimiento.getCantidad(), BigDecimal::add);
+        }
+        return acumulado.entrySet().stream()
+                .map(entry -> new DashboardDTO.CategoriaConsumoDTO(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(DashboardDTO.CategoriaConsumoDTO::getCantidadConsumida).reversed())
+                .toList();
+    }
+
+    private List<DashboardDTO.VariacionStockDTO> obtenerVariacionStock(List<Producto> productos,
+                                                                        List<MovimientoInventario> movimientos30Dias) {
+        Map<Long, BigDecimal> entradas = new LinkedHashMap<>();
+        Map<Long, BigDecimal> salidas = new LinkedHashMap<>();
+        for (MovimientoInventario movimiento : movimientos30Dias) {
+            Long idProducto = movimiento.getProducto().getId();
+            if (TIPO_ENTRADA.equals(movimiento.getTipoMovimiento())) {
+                entradas.merge(idProducto, movimiento.getCantidad(), BigDecimal::add);
+            } else if (TIPO_SALIDA.equals(movimiento.getTipoMovimiento())) {
+                salidas.merge(idProducto, movimiento.getCantidad(), BigDecimal::add);
+            }
+        }
+        return productos.stream()
+                .map(producto -> {
+                    BigDecimal entradasProducto = entradas.getOrDefault(producto.getId(), BigDecimal.ZERO);
+                    BigDecimal salidasProducto = salidas.getOrDefault(producto.getId(), BigDecimal.ZERO);
+                    BigDecimal stockHaceTreintaDias = producto.getStockActual().subtract(entradasProducto).add(salidasProducto);
+                    BigDecimal variacionStock = producto.getStockActual().subtract(stockHaceTreintaDias);
+                    return new DashboardDTO.VariacionStockDTO(
+                            producto.getId(), producto.getNombre(), producto.getStockActual(),
+                            stockHaceTreintaDias, variacionStock);
+                })
+                .toList();
+    }
+
+    private static class ProductoConsumoAcumulado {
+        private final Producto producto;
+        private BigDecimal cantidad = BigDecimal.ZERO;
+
+        private ProductoConsumoAcumulado(Producto producto) {
+            this.producto = producto;
+        }
+
+        private void sumar(BigDecimal valor) {
+            this.cantidad = this.cantidad.add(valor);
+        }
     }
 
     private List<DashboardDTO.StockCategoria> obtenerStockPorCategoria(List<Producto> productos) {

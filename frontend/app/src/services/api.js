@@ -98,6 +98,13 @@ export const reporteCostoProveedorService = {
   descargarPdf: (proveedorId, fechaInicio, fechaFin) =>
     api.get('/reportes/costos-proveedor/pdf', { params: { proveedorId, fechaInicio, fechaFin }, responseType: 'blob' }),
 }
+export const dashboardService = {
+  consultar: () => api.get('/dashboard'),
+}
+export const historialPreciosService = {
+  consultar: (productoId, proveedorId) =>
+    api.get('/ingresos-inventario/historial-precios', { params: { productoId, proveedorId } }),
+}
 
 export function isCanceledRequest(error) {
   return axios.isCancel(error) || error?.code === 'ERR_CANCELED' || error?.name === 'AbortError'

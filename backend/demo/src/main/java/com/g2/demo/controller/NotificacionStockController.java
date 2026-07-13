@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notificaciones-stock")
-@PreAuthorize("hasAnyRole('GERENTE','ADMINISTRADOR')")
+@PreAuthorize("hasAnyRole('GERENTE','ADMINISTRADOR','ALMACEN')")
 public class NotificacionStockController {
 
     private final NotificacionStockFacade facade;
