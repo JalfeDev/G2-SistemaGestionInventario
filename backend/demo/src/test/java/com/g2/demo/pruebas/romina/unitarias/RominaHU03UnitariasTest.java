@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class RominaHU05UnitariasTest {
+class RominaHU0UnitariasTest {
 
     @Mock
     private ProductoRepository productoRepository;
