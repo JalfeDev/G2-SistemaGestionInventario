@@ -12,6 +12,7 @@ export default function HistorialPrecios() {
   const [historial, setHistorial] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const items = historial?.historial || []
 
   const consultarHistorial = useCallback((cancelado = () => false) => {
     setLoading(true)
@@ -54,7 +55,7 @@ export default function HistorialPrecios() {
       {loading ? <Loader /> : historial && (
         <>
           <Card><div className="card-title"><h3>Precio promedio</h3><strong>{money(historial.precioPromedio)}</strong></div></Card>
-          <Card>{historial.historial.length === 0 ? <Empty text="No hay precios registrados para los filtros seleccionados." /> : <div className="table-wrap"><table><thead><tr><th>Fecha de ingreso</th><th>Producto</th><th>Proveedor</th><th>Cantidad</th><th>Costo unitario</th><th>Total</th></tr></thead><tbody>{historial.historial.map((item, index) => <tr key={index}><td>{formatDate(item.fecha)}</td><td><strong>{item.producto}</strong></td><td>{item.proveedor}</td><td>{item.cantidad}</td><td>{money(item.costoUnitario)}</td><td><strong>{money(item.costoTotal)}</strong></td></tr>)}</tbody></table></div>}</Card>
+          <Card>{items.length === 0 ? <Empty text="No hay precios registrados para los filtros seleccionados." /> : <div className="table-wrap"><table><thead><tr><th>Fecha de ingreso</th><th>Producto</th><th>Proveedor</th><th>Cantidad</th><th>Costo unitario</th><th>Total</th></tr></thead><tbody>{items.map((item, index) => <tr key={`${item.fecha || 'fecha'}-${item.producto || 'producto'}-${index}`}><td>{formatDate(item.fecha)}</td><td><strong>{item.producto || '-'}</strong></td><td>{item.proveedor || '-'}</td><td>{item.cantidad ?? '-'}</td><td>{money(item.costoUnitario)}</td><td><strong>{money(item.costoTotal)}</strong></td></tr>)}</tbody></table></div>}</Card>
         </>
       )}
     </>

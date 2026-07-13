@@ -55,7 +55,7 @@ export const productoService = {
   importarCsv: (archivo) => {
     const formData = new FormData()
     formData.append('archivo', archivo)
-    return api.post('/productos/importar-csv', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+    return api.post('/productos/importar-csv', formData)
   },
 }
 export const importacionCsvService = {

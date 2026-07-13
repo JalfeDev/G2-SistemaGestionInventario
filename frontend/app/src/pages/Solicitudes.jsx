@@ -5,7 +5,17 @@ import { fallbackDetallesSolicitud, fallbackProductos, fallbackSolicitudes } fro
 import { useApiResource } from '../hooks/useApiResource'
 import { authService, detalleSolicitudService, getApiError, productoService, solicitudService } from '../services/api'
 import { formatDate } from '../utils/formatters'
-import { ROLES } from '../utils/roles'
+import { normalizeRole, ROLES } from '../utils/roles'
+
+const ESTADO_LABELS = {
+  PENDIENTE: 'PENDIENTE',
+  APROBADO: 'APROBADA',
+  RECHAZADO: 'RECHAZADA',
+}
+
+function estadoLabel(estado) {
+  return ESTADO_LABELS[estado] || estado || '-'
+}
 
 export default function Solicitudes() {
   const [searchParams] = useSearchParams()
@@ -19,10 +29,12 @@ export default function Solicitudes() {
   const [status, setStatus] = useState({ tone: '', text: '' })
   const [revisando, setRevisando] = useState(null)
   const [motivoRechazo, setMotivoRechazo] = useState('')
+  const [guardandoSolicitud, setGuardandoSolicitud] = useState(false)
+  const [guardandoRevision, setGuardandoRevision] = useState(false)
 
   useEffect(() => {
     authService.me()
-      .then(({ data }) => setMe(data))
+      .then(({ data }) => setMe({ ...data, rol: normalizeRole(data.rol) }))
       .catch((error) => setRequests({ data: fallbackSolicitudes, loading: false, error: getApiError(error) }))
   }, [])
 
@@ -52,10 +64,12 @@ export default function Solicitudes() {
 
   async function submit(event) {
     event.preventDefault()
+    if (guardandoSolicitud) return
     if (!form.productoId || !form.cantidad) return setStatus({ tone: 'danger', text: 'Selecciona un producto e indica la cantidad.' })
     if (Number(form.cantidad) <= 0) return setStatus({ tone: 'danger', text: 'La cantidad debe ser mayor a cero.' })
     if (localStorage.getItem('hotel_demo')) return setStatus({ tone: 'warning', text: 'Vista demo: la solicitud fue validada localmente. Inicia sesion para registrarla.' })
     if (!me) return setStatus({ tone: 'danger', text: 'Cargando datos de usuario, intenta de nuevo.' })
+    setGuardandoSolicitud(true)
     try {
       const payload = {
         solicitanteId: me.id,
@@ -70,13 +84,18 @@ export default function Solicitudes() {
       setStatus({ tone: 'success', text: 'Solicitud de reabastecimiento registrada.' })
     } catch (error) {
       setStatus({ tone: 'danger', text: getApiError(error) })
+    } finally {
+      setGuardandoSolicitud(false)
     }
   }
 
   async function confirmarRevision() {
+    if (guardandoRevision) return
+    if (!revisando || !me) return setStatus({ tone: 'danger', text: 'No se pudo identificar la solicitud o el usuario actual.' })
     if (revisando.accion === 'RECHAZADO' && !motivoRechazo.trim()) {
       return setStatus({ tone: 'danger', text: 'Debes indicar el motivo del rechazo.' })
     }
+    setGuardandoRevision(true)
     try {
       await solicitudService.revisar(revisando.id, {
         aprobadorId: me.id,
@@ -89,6 +108,8 @@ export default function Solicitudes() {
       setStatus({ tone: 'success', text: 'Solicitud actualizada.' })
     } catch (error) {
       setStatus({ tone: 'danger', text: getApiError(error) })
+    } finally {
+      setGuardandoRevision(false)
     }
   }
 
@@ -113,7 +134,7 @@ export default function Solicitudes() {
             <Field label="Comentario">
               <textarea value={form.comentario} onChange={(e) => setForm({ ...form, comentario: e.target.value })} placeholder="Motivo de la solicitud" />
             </Field>
-            <div className="form-actions form-full"><button className="button primary">Registrar solicitud</button></div>
+            <div className="form-actions form-full"><button className="button primary" disabled={guardandoSolicitud}>{guardandoSolicitud ? 'Registrando...' : 'Registrar solicitud'}</button></div>
           </form>
         </Card>
       )}
@@ -127,8 +148,8 @@ export default function Solicitudes() {
               </Field>
             )}
             <div className="form-actions form-full">
-              <button className="button primary" onClick={confirmarRevision}>Confirmar</button>
-              <button className="button subtle" onClick={() => { setRevisando(null); setMotivoRechazo('') }}>Cancelar</button>
+              <button className="button primary" onClick={confirmarRevision} disabled={guardandoRevision}>{guardandoRevision ? 'Guardando...' : 'Confirmar'}</button>
+              <button className="button subtle" onClick={() => { setRevisando(null); setMotivoRechazo('') }} disabled={guardandoRevision}>Cancelar</button>
             </div>
           </div>
         </Card>
@@ -153,7 +174,7 @@ export default function Solicitudes() {
                       <td>{detail?.producto?.nombre || '-'}</td>
                       <td>{detail?.cantidadSolicitada || '-'}</td>
                       <td>{item.solicitante?.nombres || item.solicitante?.usuario || '-'}</td>
-                      <td><Badge tone={item.estado === 'APROBADO' ? 'success' : item.estado === 'RECHAZADO' ? 'danger' : 'warning'}>{item.estado}</Badge></td>
+                      <td><Badge tone={item.estado === 'APROBADO' ? 'success' : item.estado === 'RECHAZADO' ? 'danger' : 'warning'}>{estadoLabel(item.estado)}</Badge></td>
                       {esGerente && (
                         <td>
                           {item.estado === 'PENDIENTE' && (

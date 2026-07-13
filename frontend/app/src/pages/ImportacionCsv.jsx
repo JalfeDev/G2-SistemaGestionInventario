@@ -50,6 +50,7 @@ export default function ImportacionCsv() {
       })
       setRows(parsed)
     }
+    reader.onerror = () => setCsvError('No se pudo leer el archivo seleccionado.')
     reader.readAsText(selected)
   }
 

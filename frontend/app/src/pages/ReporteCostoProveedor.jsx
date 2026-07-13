@@ -10,10 +10,13 @@ export default function ReporteCostoProveedor() {
   const [filters, setFilters] = useState({ proveedorId: '', fechaInicio: '', fechaFin: '' })
   const [report, setReport] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [error, setError] = useState('')
+  const proveedoresReporte = report?.proveedores || []
 
   async function consult(event) {
     event.preventDefault()
+    if (loading) return
     if (!filters.fechaInicio || !filters.fechaFin) return setError('Selecciona fecha de inicio y fecha de fin.')
     if (filters.fechaInicio > filters.fechaFin) return setError('La fecha de inicio no puede ser posterior a la fecha de fin.')
     setLoading(true)
@@ -29,7 +32,11 @@ export default function ReporteCostoProveedor() {
   }
 
   async function downloadPdf() {
+    if (downloading) return
+    if (!filters.fechaInicio || !filters.fechaFin) return setError('Selecciona fecha de inicio y fecha de fin.')
+    if (filters.fechaInicio > filters.fechaFin) return setError('La fecha de inicio no puede ser posterior a la fecha de fin.')
     setError('')
+    setDownloading(true)
     try {
       const { data } = await reporteCostoProveedorService.descargarPdf(filters.proveedorId || undefined, filters.fechaInicio, filters.fechaFin)
       const url = URL.createObjectURL(new Blob([data], { type: 'application/pdf' }))
@@ -42,6 +49,8 @@ export default function ReporteCostoProveedor() {
       setTimeout(() => URL.revokeObjectURL(url), 1000)
     } catch (requestError) {
       setError(getApiError(requestError))
+    } finally {
+      setDownloading(false)
     }
   }
 
@@ -60,22 +69,22 @@ export default function ReporteCostoProveedor() {
           <Field label="Fecha de inicio"><input type="date" value={filters.fechaInicio} onChange={(event) => setFilters({ ...filters, fechaInicio: event.target.value })} /></Field>
           <Field label="Fecha de fin"><input type="date" value={filters.fechaFin} onChange={(event) => setFilters({ ...filters, fechaFin: event.target.value })} /></Field>
           <div className="form-actions">
-            <button className="button primary">Consultar</button>
-            {report?.proveedores.length > 0 && <button type="button" className="button subtle" onClick={downloadPdf}>Descargar PDF</button>}
+            <button className="button primary" disabled={loading}>{loading ? 'Consultando...' : 'Consultar'}</button>
+            {proveedoresReporte.length > 0 && <button type="button" className="button subtle" onClick={downloadPdf} disabled={downloading}>{downloading ? 'Generando...' : 'Descargar PDF'}</button>}
           </div>
         </form>
       </Card>
-      {loading ? <Loader /> : report && (report.proveedores.length === 0 ? <Card><Empty text="No hay compras registradas en este rango." /></Card> : (
+      {loading ? <Loader /> : report && (proveedoresReporte.length === 0 ? <Card><Empty text="No hay compras registradas en este rango." /></Card> : (
         <>
-          {report.proveedores.map((proveedor) => (
+          {proveedoresReporte.map((proveedor) => (
             <Card key={proveedor.proveedor}>
-              <div className="card-title"><div><span>Proveedor</span><h3>{proveedor.proveedor}</h3></div><strong>Subtotal: {money(proveedor.subtotal)}</strong></div>
+              <div className="card-title"><div><span>Proveedor</span><h3>{proveedor.proveedor || '-'}</h3></div><strong>Subtotal: {money(proveedor.subtotal)}</strong></div>
               <div className="table-wrap">
                 <table>
                   <thead><tr><th>Fecha</th><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Costo total</th></tr></thead>
                   <tbody>
-                    {proveedor.items.map((item, index) => (
-                      <tr key={index}><td>{formatDate(item.fecha)}</td><td><strong>{item.producto}</strong></td><td>{item.cantidad}</td><td>{money(item.precioUnitario)}</td><td>{money(item.costoTotal)}</td></tr>
+                    {(proveedor.items || []).map((item, index) => (
+                      <tr key={`${item.fecha || 'fecha'}-${item.producto || 'producto'}-${index}`}><td>{formatDate(item.fecha)}</td><td><strong>{item.producto || '-'}</strong></td><td>{item.cantidad ?? '-'}</td><td>{money(item.precioUnitario)}</td><td>{money(item.costoTotal)}</td></tr>
                     ))}
                   </tbody>
                 </table>
