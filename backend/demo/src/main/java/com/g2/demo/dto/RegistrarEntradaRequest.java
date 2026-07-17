@@ -14,4 +14,5 @@ public class RegistrarEntradaRequest {
     private BigDecimal cantidad;
     private BigDecimal costoUnitario;
     private String observacion;
+    private Long solicitudId;
 }

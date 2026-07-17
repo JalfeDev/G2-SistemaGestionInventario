@@ -34,4 +34,8 @@ public class IngresoInventario {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_solicitud")
+    private SolicitudCompra solicitud;
 }

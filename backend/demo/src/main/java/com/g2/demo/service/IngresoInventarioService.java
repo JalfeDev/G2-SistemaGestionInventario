@@ -3,17 +3,21 @@ package com.g2.demo.service;
 import com.g2.demo.dto.HistorialPrecioItem;
 import com.g2.demo.dto.HistorialPreciosResponse;
 import com.g2.demo.dto.RegistrarEntradaRequest;
+import com.g2.demo.entity.DetalleSolicitud;
 import com.g2.demo.entity.DetalleIngreso;
 import com.g2.demo.entity.IngresoInventario;
 import com.g2.demo.entity.MovimientoInventario;
 import com.g2.demo.entity.Producto;
 import com.g2.demo.entity.Proveedor;
+import com.g2.demo.entity.SolicitudCompra;
 import com.g2.demo.entity.Usuario;
 import com.g2.demo.repository.DetalleIngresoRepository;
+import com.g2.demo.repository.DetalleSolicitudRepository;
 import com.g2.demo.repository.IngresoInventarioRepository;
 import com.g2.demo.repository.MovimientoInventarioRepository;
 import com.g2.demo.repository.ProductoRepository;
 import com.g2.demo.repository.ProveedorRepository;
+import com.g2.demo.repository.SolicitudCompraRepository;
 import com.g2.demo.repository.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,11 @@ import java.util.List;
 @Service
 public class IngresoInventarioService extends CrudService<IngresoInventario> {
 
+    private static final String ESTADO_APROBADO = "APROBADO";
+    private static final String ESTADO_ATENDIDA = "ATENDIDA";
+    private static final String ESTADO_RECHAZADO = "RECHAZADO";
+    private static final String ESTADO_PENDIENTE = "PENDIENTE";
+
     private final IngresoInventarioRepository ingresoRepository;
     private final DetalleIngresoRepository detalleRepository;
     private final ProductoRepository productoRepository;
@@ -34,6 +43,8 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
     private final UsuarioRepository usuarioRepository;
     private final MovimientoInventarioRepository movimientoRepository;
     private final NotificacionStockService notificacionStockService;
+    private final SolicitudCompraRepository solicitudCompraRepository;
+    private final DetalleSolicitudRepository detalleSolicitudRepository;
 
     public IngresoInventarioService(IngresoInventarioRepository repository,
                                     DetalleIngresoRepository detalleRepository,
@@ -41,7 +52,9 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
                                     ProveedorRepository proveedorRepository,
                                     UsuarioRepository usuarioRepository,
                                     MovimientoInventarioRepository movimientoRepository,
-                                    NotificacionStockService notificacionStockService) {
+                                    NotificacionStockService notificacionStockService,
+                                    SolicitudCompraRepository solicitudCompraRepository,
+                                    DetalleSolicitudRepository detalleSolicitudRepository) {
         super(repository, "Ingreso de inventario");
         this.ingresoRepository = repository;
         this.detalleRepository = detalleRepository;
@@ -50,6 +63,8 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         this.usuarioRepository = usuarioRepository;
         this.movimientoRepository = movimientoRepository;
         this.notificacionStockService = notificacionStockService;
+        this.solicitudCompraRepository = solicitudCompraRepository;
+        this.detalleSolicitudRepository = detalleSolicitudRepository;
     }
 
     public List<DetalleIngreso> listarHistorial() {
@@ -59,11 +74,13 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
     @Transactional
     public DetalleIngreso registrar(RegistrarEntradaRequest request, String username) {
         validar(request);
+        DetalleSolicitud detalleSolicitud = validarSolicitudSiAplica(request);
         Producto producto = productoRepository.findWithLockById(request.getProductoId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
         Proveedor proveedor = proveedorRepository.findById(request.getProveedorId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Proveedor no encontrado"));
         Usuario usuario = buscarUsuario(username);
+        SolicitudCompra solicitud = detalleSolicitud != null ? detalleSolicitud.getSolicitud() : null;
 
         BigDecimal stockAnterior = producto.getStockActual();
         BigDecimal stockNuevo = stockAnterior.add(request.getCantidad());
@@ -73,6 +90,7 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         ingreso.setFechaIngreso(LocalDateTime.now());
         ingreso.setObservacion(request.getObservacion());
         ingreso.setUsuario(usuario);
+        ingreso.setSolicitud(solicitud);
         ingresoRepository.save(ingreso);
 
         DetalleIngreso detalle = new DetalleIngreso();
@@ -87,8 +105,63 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         producto.setStockActual(stockNuevo);
         productoRepository.save(producto);
         movimientoRepository.save(crearMovimiento("ENTRADA", request.getCantidad(), stockAnterior, stockNuevo, producto, usuario));
+        if (solicitud != null) {
+            solicitud.setEstado(ESTADO_ATENDIDA);
+            solicitudCompraRepository.save(solicitud);
+        }
         notificacionStockService.evaluarStockCritico(producto);
         return detalle;
+    }
+
+    private DetalleSolicitud validarSolicitudSiAplica(RegistrarEntradaRequest request) {
+        if (request.getSolicitudId() == null) {
+            return null;
+        }
+
+        SolicitudCompra solicitud = solicitudCompraRepository.findWithLockById(request.getSolicitudId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
+        validarEstadoSolicitud(solicitud);
+
+        List<DetalleSolicitud> detalles = detalleSolicitudRepository.findBySolicitudId(solicitud.getId());
+        if (detalles.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La solicitud no tiene productos para recibir");
+        }
+        if (detalles.size() > 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "La recepcion desde solicitud solo admite solicitudes de un producto");
+        }
+
+        DetalleSolicitud detalle = detalles.get(0);
+        if (!detalle.getProducto().getId().equals(request.getProductoId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El producto de la entrada debe coincidir con el producto solicitado");
+        }
+        if (request.getCantidad().compareTo(detalle.getCantidadSolicitada()) != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La cantidad recibida debe coincidir con la cantidad aprobada");
+        }
+        detalle.setSolicitud(solicitud);
+        return detalle;
+    }
+
+    private void validarEstadoSolicitud(SolicitudCompra solicitud) {
+        if (ESTADO_APROBADO.equals(solicitud.getEstado())) {
+            return;
+        }
+        if (ESTADO_PENDIENTE.equals(solicitud.getEstado())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "La solicitud pendiente no puede generar una entrada");
+        }
+        if (ESTADO_RECHAZADO.equals(solicitud.getEstado())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "La solicitud rechazada no puede generar una entrada");
+        }
+        if (ESTADO_ATENDIDA.equals(solicitud.getEstado())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "La solicitud ya fue atendida");
+        }
+        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "La solicitud debe estar aprobada para generar una entrada");
     }
 
     private Usuario buscarUsuario(String username) {

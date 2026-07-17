@@ -14,6 +14,7 @@ import com.g2.demo.entity.Proveedor;
 import com.g2.demo.entity.Usuario;
 import com.g2.demo.repository.DetalleDistribucionRepository;
 import com.g2.demo.repository.DetalleIngresoRepository;
+import com.g2.demo.repository.DetalleSolicitudRepository;
 import com.g2.demo.repository.DistribucionInsumosRepository;
 import com.g2.demo.repository.CategoriaRepository;
 import com.g2.demo.repository.HabitacionRepository;
@@ -21,6 +22,7 @@ import com.g2.demo.repository.IngresoInventarioRepository;
 import com.g2.demo.repository.MovimientoInventarioRepository;
 import com.g2.demo.repository.ProductoRepository;
 import com.g2.demo.repository.ProveedorRepository;
+import com.g2.demo.repository.SolicitudCompraRepository;
 import com.g2.demo.repository.UnidadMedidaRepository;
 import com.g2.demo.repository.UsuarioRepository;
 import com.g2.demo.service.DistribucionInsumosService;
@@ -78,6 +80,10 @@ class Sprint1BusinessRulesTests {
     private MovimientoInventarioRepository movimientoRepository;
     @Mock
     private NotificacionStockService notificacionStockService;
+    @Mock
+    private SolicitudCompraRepository solicitudCompraRepository;
+    @Mock
+    private DetalleSolicitudRepository detalleSolicitudRepository;
 
     private IngresoInventarioService ingresoService;
     private DistribucionInsumosService distribucionService;
@@ -85,7 +91,8 @@ class Sprint1BusinessRulesTests {
     @BeforeEach
     void setUp() {
         ingresoService = new IngresoInventarioService(ingresoRepository, detalleIngresoRepository, productoRepository,
-                proveedorRepository, usuarioRepository, movimientoRepository, notificacionStockService);
+                proveedorRepository, usuarioRepository, movimientoRepository, notificacionStockService,
+                solicitudCompraRepository, detalleSolicitudRepository);
         distribucionService = new DistribucionInsumosService(distribucionRepository, detalleDistribucionRepository,
                 productoRepository, habitacionRepository, usuarioRepository, movimientoRepository, notificacionStockService);
     }

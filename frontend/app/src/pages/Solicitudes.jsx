@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Badge, Card, Empty, Field, Icon, Loader, Notice, PageHeader, ResourceNotice } from '../components/ui'
 import { fallbackDetallesSolicitud, fallbackProductos, fallbackSolicitudes } from '../data/fallbackData'
 import { useApiResource } from '../hooks/useApiResource'
@@ -11,10 +11,17 @@ const ESTADO_LABELS = {
   PENDIENTE: 'PENDIENTE',
   APROBADO: 'APROBADA',
   RECHAZADO: 'RECHAZADA',
+  ATENDIDA: 'ATENDIDA',
 }
 
 function estadoLabel(estado) {
   return ESTADO_LABELS[estado] || estado || '-'
+}
+
+function estadoTone(estado) {
+  if (estado === 'APROBADO' || estado === 'ATENDIDA') return 'success'
+  if (estado === 'RECHAZADO') return 'danger'
+  return 'warning'
 }
 
 export default function Solicitudes() {
@@ -161,7 +168,7 @@ export default function Solicitudes() {
               <thead>
                 <tr>
                   <th>Solicitud</th><th>Fecha</th><th>Producto</th><th>Cantidad</th><th>Solicitante</th><th>Estado</th>
-                  {esGerente && <th>Acciones</th>}
+                  {(esGerente || esAlmacen) && <th>Acciones</th>}
                 </tr>
               </thead>
               <tbody>
@@ -174,8 +181,8 @@ export default function Solicitudes() {
                       <td>{detail?.producto?.nombre || '-'}</td>
                       <td>{detail?.cantidadSolicitada || '-'}</td>
                       <td>{item.solicitante?.nombres || item.solicitante?.usuario || '-'}</td>
-                      <td><Badge tone={item.estado === 'APROBADO' ? 'success' : item.estado === 'RECHAZADO' ? 'danger' : 'warning'}>{estadoLabel(item.estado)}</Badge></td>
-                      {esGerente && (
+                      <td><Badge tone={estadoTone(item.estado)}>{estadoLabel(item.estado)}</Badge></td>
+                      {(esGerente || esAlmacen) && (
                         <td>
                           {item.estado === 'PENDIENTE' && (
                             <div className="form-actions">
@@ -183,6 +190,10 @@ export default function Solicitudes() {
                               <button className="button subtle" onClick={() => setRevisando({ id: item.id, accion: 'RECHAZADO' })}>Rechazar</button>
                             </div>
                           )}
+                          {esAlmacen && item.estado === 'APROBADO' && (
+                            <Link className="button subtle" to={`/entradas?solicitudId=${item.id}`}>Registrar recepcion</Link>
+                          )}
+                          {!(esGerente && item.estado === 'PENDIENTE') && !(esAlmacen && item.estado === 'APROBADO') && '-'}
                         </td>
                       )}
                     </tr>
