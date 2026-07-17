@@ -121,6 +121,7 @@ export function isCanceledRequest(error) {
 
 export function getApiError(error, fallback = 'No se pudo completar la operacion.') {
   if (isCanceledRequest(error)) return ''
+  if (error?.code === 'ECONNABORTED') return 'La operacion tardo demasiado. Revisa si el backend esta enviando correos y vuelve a intentar.'
   const status = error?.response?.status
   const detail = error?.response?.data?.detail || error?.response?.data?.message || error?.response?.data?.error
   if (status === 401) {

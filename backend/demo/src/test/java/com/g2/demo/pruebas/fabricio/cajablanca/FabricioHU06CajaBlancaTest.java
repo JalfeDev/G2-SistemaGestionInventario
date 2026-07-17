@@ -58,7 +58,7 @@ class FabricioHU06CajaBlancaTest {
 
     private DistribucionInsumosService service;
 
-    @BeforeEach
+    @BeforeEach 
     void setUp() {
         service = new DistribucionInsumosService(distribucionRepository, detalleRepository, productoRepository,
                 habitacionRepository, usuarioRepository, movimientoRepository, notificacionStockService);
