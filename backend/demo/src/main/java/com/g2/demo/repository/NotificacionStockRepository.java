@@ -9,6 +9,8 @@ public interface NotificacionStockRepository extends JpaRepository<NotificacionS
 
     List<NotificacionStock> findByProductoIdAndTipoAndResueltaFalse(Long productoId, String tipo);
 
+    List<NotificacionStock> findTop10ByTipoAndResueltaFalseAndEnviadoFalseOrderByFechaEnvioAsc(String tipo);
+
     List<NotificacionStock> findAllByOrderByFechaEnvioDesc();
 
     List<NotificacionStock> findTop10ByOrderByFechaEnvioDesc();

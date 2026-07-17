@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,12 +19,9 @@ public class NotificacionStockService {
     private static final Logger log = LoggerFactory.getLogger(NotificacionStockService.class);
 
     private final NotificacionStockRepository repository;
-    private final NotificacionStockCorreoService correoService;
 
-    public NotificacionStockService(NotificacionStockRepository repository,
-                                    NotificacionStockCorreoService correoService) {
+    public NotificacionStockService(NotificacionStockRepository repository) {
         this.repository = repository;
-        this.correoService = correoService;
     }
 
     public List<NotificacionStock> listar() {
@@ -54,17 +49,12 @@ public class NotificacionStockService {
                 return;
             }
             if (!activas.isEmpty()) {
-                activas.stream()
-                        .filter(notificacion -> Boolean.FALSE.equals(notificacion.getEnviado()))
-                        .findFirst()
-                        .ifPresent(this::programarEnvioCorreo);
                 log.info("Stock critico ya notificado para producto {}", producto.getNombre());
                 return;
             }
 
             NotificacionStock notificacion = crearNotificacion(producto);
             repository.save(notificacion);
-            programarEnvioCorreo(notificacion);
         } catch (Exception ex) {
             log.warn("No se pudo procesar la notificacion de stock critico", ex);
         }
@@ -90,21 +80,5 @@ public class NotificacionStockService {
         notificacion.setEnviado(false);
         notificacion.setResuelta(false);
         return notificacion;
-    }
-
-    private void programarEnvioCorreo(NotificacionStock notificacion) {
-        if (notificacion.getId() == null) {
-            return;
-        }
-        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            correoService.enviarCorreo(notificacion.getId());
-            return;
-        }
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                correoService.enviarCorreo(notificacion.getId());
-            }
-        });
     }
 }
