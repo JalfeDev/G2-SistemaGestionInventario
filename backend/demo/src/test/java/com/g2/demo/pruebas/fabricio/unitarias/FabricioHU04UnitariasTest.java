@@ -8,10 +8,12 @@ import com.g2.demo.entity.Producto;
 import com.g2.demo.entity.Proveedor;
 import com.g2.demo.entity.Usuario;
 import com.g2.demo.repository.DetalleIngresoRepository;
+import com.g2.demo.repository.DetalleSolicitudRepository;
 import com.g2.demo.repository.IngresoInventarioRepository;
 import com.g2.demo.repository.MovimientoInventarioRepository;
 import com.g2.demo.repository.ProductoRepository;
 import com.g2.demo.repository.ProveedorRepository;
+import com.g2.demo.repository.SolicitudCompraRepository;
 import com.g2.demo.repository.UsuarioRepository;
 import com.g2.demo.service.IngresoInventarioService;
 import com.g2.demo.service.NotificacionStockService;
@@ -52,13 +54,18 @@ class FabricioHU04UnitariasTest {
     private MovimientoInventarioRepository movimientoRepository;
     @Mock
     private NotificacionStockService notificacionStockService;
+    @Mock
+    private SolicitudCompraRepository solicitudCompraRepository;
+    @Mock
+    private DetalleSolicitudRepository detalleSolicitudRepository;
 
     private IngresoInventarioService service;
 
     @BeforeEach
     void setUp() {
         service = new IngresoInventarioService(ingresoRepository, detalleRepository, productoRepository,
-                proveedorRepository, usuarioRepository, movimientoRepository, notificacionStockService);
+                proveedorRepository, usuarioRepository, movimientoRepository, notificacionStockService,
+                solicitudCompraRepository, detalleSolicitudRepository);
     }
 
     @Test
