@@ -35,11 +35,12 @@ export default function ReporteCostoProveedor() {
     if (downloading) return
     if (!filters.fechaInicio || !filters.fechaFin) return setError('Selecciona fecha de inicio y fecha de fin.')
     if (filters.fechaInicio > filters.fechaFin) return setError('La fecha de inicio no puede ser posterior a la fecha de fin.')
+    if (proveedoresReporte.length === 0) return setError('No hay datos para exportar.')
     setError('')
     setDownloading(true)
     try {
-      const { data } = await reporteCostoProveedorService.descargarPdf(filters.proveedorId || undefined, filters.fechaInicio, filters.fechaFin)
-      const url = URL.createObjectURL(new Blob([data], { type: 'application/pdf' }))
+      const pdf = generarPdfCostosProveedor(report, filters)
+      const url = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }))
       const link = document.createElement('a')
       link.href = url
       link.download = `reporte-costos-proveedor-${filters.fechaInicio}-${filters.fechaFin}.pdf`
@@ -47,8 +48,9 @@ export default function ReporteCostoProveedor() {
       link.click()
       link.remove()
       setTimeout(() => URL.revokeObjectURL(url), 1000)
-    } catch (requestError) {
-      setError(getApiError(requestError))
+    } catch (pdfError) {
+      console.error('No se pudo generar el PDF de costos por proveedor.', pdfError)
+      setError('No se pudo generar el PDF.')
     } finally {
       setDownloading(false)
     }
@@ -96,4 +98,95 @@ export default function ReporteCostoProveedor() {
       ))}
     </>
   )
+}
+
+function generarPdfCostosProveedor(report, filters) {
+  const lineas = [
+    'Hotel Piramide - Reporte de costos por proveedor',
+    `Fecha de inicio: ${report?.fechaInicio || filters.fechaInicio}`,
+    `Fecha de fin: ${report?.fechaFin || filters.fechaFin}`,
+    `Fecha de generacion: ${new Date().toLocaleString('es-PE')}`,
+    '',
+  ]
+
+  for (const proveedor of report?.proveedores || []) {
+    lineas.push(`Proveedor: ${proveedor.proveedor || '-'}`)
+    for (const item of proveedor.items || []) {
+      lineas.push(`  Fecha: ${formatDate(item.fecha)}`)
+      lineas.push(`  Producto: ${item.producto || '-'} | Cantidad: ${item.cantidad ?? '-'} | Precio unitario: ${money(item.precioUnitario)} | Costo total: ${money(item.costoTotal)}`)
+    }
+    lineas.push(`Subtotal: ${money(proveedor.subtotal)}`)
+    lineas.push('')
+  }
+
+  lineas.push(`Total general: ${money(report?.totalGeneral)}`)
+  return construirPdf(lineas)
+}
+
+function construirPdf(lineas) {
+  const paginas = paginar(lineas)
+  const objetos = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    construirIndicePaginas(paginas.length),
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+  ]
+
+  paginas.forEach((pagina, index) => {
+    const contenidoId = 5 + index * 2
+    objetos.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 3 0 R >> >> /Contents ${contenidoId} 0 R >>`)
+    const contenido = construirContenidoPagina(pagina)
+    objetos.push(`<< /Length ${contenido.length} >>\nstream\n${contenido}\nendstream`)
+  })
+
+  let salida = '%PDF-1.4\n'
+  const offsets = [0]
+  objetos.forEach((objeto, index) => {
+    offsets.push(salida.length)
+    salida += `${index + 1} 0 obj\n${objeto}\nendobj\n`
+  })
+
+  const inicioXref = salida.length
+  salida += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n`
+  for (let index = 1; index < offsets.length; index++) {
+    salida += `${String(offsets[index]).padStart(10, '0')} 00000 n \n`
+  }
+  salida += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${inicioXref}\n%%EOF`
+  return salida
+}
+
+function paginar(lineas) {
+  const lineasPorPagina = 42
+  const paginas = []
+  for (let inicio = 0; inicio < lineas.length; inicio += lineasPorPagina) {
+    paginas.push(lineas.slice(inicio, inicio + lineasPorPagina))
+  }
+  return paginas.length > 0 ? paginas : [['']]
+}
+
+function construirIndicePaginas(cantidad) {
+  let kids = ''
+  for (let index = 0; index < cantidad; index++) {
+    kids += `${4 + index * 2} 0 R `
+  }
+  return `<< /Type /Pages /Kids [${kids}] /Count ${cantidad} >>`
+}
+
+function construirContenidoPagina(lineas) {
+  let contenido = 'BT /F1 10 Tf 50 795 Td 14 TL\n'
+  for (const linea of lineas) {
+    contenido += `(${escaparPdf(normalizarPdf(linea))}) Tj T*\n`
+  }
+  return `${contenido}ET`
+}
+
+function normalizarPdf(texto) {
+  return String(texto ?? '')
+    .replace(/\u00A0/g, ' ')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\x20-\x7E]/g, '?')
+}
+
+function escaparPdf(texto) {
+  return texto.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
 }
