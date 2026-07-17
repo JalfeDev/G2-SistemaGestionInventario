@@ -80,6 +80,7 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         Proveedor proveedor = proveedorRepository.findById(request.getProveedorId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Proveedor no encontrado"));
         Usuario usuario = buscarUsuario(username);
+        validarEntradaManual(request, usuario);
         SolicitudCompra solicitud = detalleSolicitud != null ? detalleSolicitud.getSolicitud() : null;
 
         BigDecimal stockAnterior = producto.getStockActual();
@@ -142,6 +143,16 @@ public class IngresoInventarioService extends CrudService<IngresoInventario> {
         }
         detalle.setSolicitud(solicitud);
         return detalle;
+    }
+
+    private void validarEntradaManual(RegistrarEntradaRequest request, Usuario usuario) {
+        if (request.getSolicitudId() != null || usuario.getRol() == null) {
+            return;
+        }
+        if ("ALMACEN".equals(usuario.getRol().getNombre())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "El encargado de almacen debe registrar entradas desde una solicitud aprobada");
+        }
     }
 
     private void validarEstadoSolicitud(SolicitudCompra solicitud) {

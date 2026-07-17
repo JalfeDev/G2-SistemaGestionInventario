@@ -6,7 +6,6 @@ import com.g2.demo.repository.NotificacionStockRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -38,7 +37,7 @@ public class NotificacionStockService {
         return repository.findTop10ByOrderByFechaEnvioDesc();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void evaluarStockCritico(Producto producto) {
         try {
             if (producto == null || producto.getId() == null

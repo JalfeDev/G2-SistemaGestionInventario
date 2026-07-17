@@ -7,6 +7,7 @@ import com.g2.demo.entity.IngresoInventario;
 import com.g2.demo.entity.MovimientoInventario;
 import com.g2.demo.entity.Producto;
 import com.g2.demo.entity.Proveedor;
+import com.g2.demo.entity.Rol;
 import com.g2.demo.entity.SolicitudCompra;
 import com.g2.demo.entity.Usuario;
 import com.g2.demo.repository.DetalleIngresoRepository;
@@ -83,6 +84,24 @@ class Hu11EntradaSolicitudTests {
         verify(detalleSolicitudRepository, never()).findBySolicitudId(any());
         verify(ingresoRepository, never()).save(any());
         verify(productoRepository, never()).save(any());
+        verify(movimientoRepository, never()).save(any());
+    }
+
+    @Test
+    void almacenNoPuedeRegistrarEntradaManualSinSolicitudAprobada() {
+        Producto producto = producto(1L, "Shampoo", "10.00");
+        when(productoRepository.findWithLockById(1L)).thenReturn(Optional.of(producto));
+        when(proveedorRepository.findById(2L)).thenReturn(Optional.of(new Proveedor()));
+        when(usuarioRepository.findByUsernameOrEmail("almacen", "almacen")).thenReturn(Optional.of(usuarioConRol("ALMACEN")));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> service.registrar(entradaManual(1L, "5.00"), "almacen"));
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        assertEquals("El encargado de almacen debe registrar entradas desde una solicitud aprobada", exception.getReason());
+        verify(solicitudCompraRepository, never()).findWithLockById(any());
+        assertEquals(0, new BigDecimal("10.00").compareTo(producto.getStockActual()));
+        verify(ingresoRepository, never()).save(any());
         verify(movimientoRepository, never()).save(any());
     }
 
@@ -214,6 +233,12 @@ class Hu11EntradaSolicitudTests {
         return request;
     }
 
+    private RegistrarEntradaRequest entradaManual(Long productoId, String cantidad) {
+        RegistrarEntradaRequest request = entradaDesdeSolicitud(null, productoId, cantidad);
+        request.setObservacion("Entrada manual");
+        return request;
+    }
+
     private SolicitudCompra solicitud(String estado) {
         SolicitudCompra solicitud = new SolicitudCompra();
         solicitud.setId(10L);
@@ -236,5 +261,13 @@ class Hu11EntradaSolicitudTests {
         producto.setStockActual(new BigDecimal(stock));
         producto.setStockMinimo(BigDecimal.ZERO);
         return producto;
+    }
+
+    private Usuario usuarioConRol(String nombreRol) {
+        Rol rol = new Rol();
+        rol.setNombre(nombreRol);
+        Usuario usuario = new Usuario();
+        usuario.setRol(rol);
+        return usuario;
     }
 }
