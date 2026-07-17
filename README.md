@@ -1,9 +1,10 @@
 # Sistema de Gestión de Inventario — Hotel Pirámide
 
-# Link
-[LINK A LA PAGINA](https://frontend-g2-sistemagestioninventario-itsajob.up.railway.app/login)
+## Enlace de la aplicación
 
-> **Ingeniería de Software II · Grupo 2**
+[Aplicación Web](https://frontend-g2-sistemagestioninventario-itsajob.up.railway.app/login)
+
+> **Ingeniería de Software II · Grupo 2**  
 > Universidad de Lima — Facultad de Ingeniería de Sistemas
 
 ---
@@ -22,30 +23,31 @@
 
 ## Descripción del proyecto
 
-Sistema web para gestionar el inventario de insumos del Hotel Pirámide. Permite registrar entradas de productos, controlar el stock, generar alertas de reabastecimiento y producir reportes de consumo y costos por proveedor.
+Sistema web desarrollado para administrar el inventario de insumos del Hotel Pirámide. Permite registrar productos, controlar el stock disponible, gestionar entradas y salidas, generar alertas de stock mínimo y consultar reportes de consumo y costos por proveedor.
 
-Roles del sistema: **Administrador**, **Gerente**, **Encargado de Almacén** y **Housekeeping**.
+Roles del sistema:
+
+- **Administrador**
+- **Gerente**
+- **Encargado de Almacén**
+- **Housekeeping**
 
 ---
 
 ## Historias de usuario
 
----
-
 ### 1. Feature: Autenticación de usuarios
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como usuario del sistema,
-quiero iniciar sesión con mi nombre de usuario y contraseña,
-para acceder solo a las funciones que me corresponden según mi rol.
+Como usuario del sistema, quiero iniciar sesión con mi nombre de usuario y contraseña para acceder únicamente a las funciones permitidas según mi rol.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] El sistema pide usuario y contraseña antes de mostrar cualquier pantalla
-- [ ] Si los datos son incorrectos, muestra un mensaje de error
-- [ ] Cada rol ve un menú distinto al entrar: Gerente, Administrador, Almacén o Housekeeping
-- [ ] Al cerrar sesión el sistema regresa a la pantalla de login
+- [ ] El sistema solicita usuario y contraseña antes de mostrar cualquier pantalla.
+- [ ] Si las credenciales son incorrectas, muestra un mensaje de error.
+- [ ] Cada rol visualiza un menú diferente: Gerente, Administrador, Encargado de Almacén o Housekeeping.
+- [ ] Al cerrar sesión, el sistema regresa a la pantalla de inicio de sesión.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -63,19 +65,17 @@ para acceder solo a las funciones que me corresponden según mi rol.
 
 ### 2. Feature: Gestión de usuarios
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como administrador,
-quiero crear y administrar los usuarios del sistema con sus roles,
-para controlar quién puede entrar y qué puede hacer.
+Como administrador, quiero crear y administrar los usuarios del sistema con sus respectivos roles para controlar el acceso a la aplicación.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Puede registrar un usuario ingresando nombre, apellido, nombre de usuario y rol
-- [ ] No permite registrar dos usuarios con el mismo nombre de usuario
-- [ ] Los roles disponibles son: Gerente, Encargado de Almacén y Housekeeping
-- [ ] Puede cambiar el rol de un usuario existente
-- [ ] Puede desactivar un usuario para que no pueda ingresar al sistema
+- [ ] Registrar un usuario con nombre, apellido, nombre de usuario y rol.
+- [ ] No permitir usuarios con el mismo nombre de usuario.
+- [ ] Los roles disponibles son Gerente, Encargado de Almacén y Housekeeping.
+- [ ] Modificar el rol de un usuario existente.
+- [ ] Desactivar usuarios para impedir su acceso.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -93,19 +93,17 @@ para controlar quién puede entrar y qué puede hacer.
 
 ### 3. Feature: Gestión de productos
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como administrador,
-quiero registrar, editar y eliminar productos del catálogo,
-para mantener actualizada la lista de insumos del hotel.
+Como administrador, quiero registrar, editar y eliminar productos para mantener actualizado el catálogo de insumos del hotel.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Puede registrar un producto con nombre, categoría y unidad de medida
-- [ ] No permite registrar dos productos con el mismo nombre en la misma categoría
-- [ ] Puede editar los datos de un producto existente
-- [ ] Solo puede eliminar un producto si no tiene movimientos registrados
-- [ ] La lista muestra nombre, categoría, stock actual y stock mínimo de cada producto
+- [ ] Registrar productos indicando nombre, categoría y unidad de medida.
+- [ ] Evitar productos duplicados en la misma categoría.
+- [ ] Editar productos existentes.
+- [ ] Eliminar únicamente productos sin movimientos registrados.
+- [ ] Mostrar nombre, categoría, stock actual y stock mínimo.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -121,51 +119,19 @@ para mantener actualizada la lista de insumos del hotel.
 
 ---
 
-### 4. Feature: Configuración del sistema
+### 4. Feature: Registro de entradas de insumos
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como administrador,
-quiero configurar el stock mínimo, las categorías y las unidades de medida,
-para adaptar el sistema a cómo trabaja el hotel.
+Como encargado de almacén, quiero registrar las entradas de insumos para mantener actualizado el stock y registrar los costos de compra.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Puede definir y modificar el stock mínimo de cada producto
-- [ ] Puede crear, editar y eliminar categorías de productos
-- [ ] Puede crear, editar y eliminar unidades de medida
-- [ ] No se puede eliminar una categoría que tenga productos asignados
-- [ ] Los cambios se ven reflejados de inmediato en el sistema
-
-| Propiedad | Valor |
-|-----------|-------|
-| Status | Todo |
-| Assignee | Juan Loyola |
-| Labels | `enhancement` `backend` `frontend` `database` |
-| Priority | P1 |
-| Size | M |
-| Estimate | 5 pts |
-| Iteration | Sprint 1 |
-| Start Date | 2026-05-30 |
-| Target Date | 2026-06-05 |
-
----
-
-### 5. Feature: Registro de entradas de insumos
-
-## Historia de Usuario
-
-Como encargado de almacén,
-quiero registrar las entradas de insumos indicando el proveedor y el precio pagado,
-para mantener el stock actualizado y saber cuánto costó cada compra.
-
-## Criterios de Aceptación
-
-- [ ] Puede registrar una entrada con: producto, cantidad, fecha, proveedor y precio por unidad
-- [ ] El stock del producto sube automáticamente al guardar la entrada
-- [ ] La cantidad debe ser mayor a cero
-- [ ] El sistema calcula el costo total de la entrada (cantidad × precio unitario)
-- [ ] Queda guardado quién registró la entrada y cuándo
+- [ ] Registrar producto, cantidad, fecha, proveedor y precio unitario.
+- [ ] Actualizar automáticamente el stock.
+- [ ] Validar que la cantidad sea mayor que cero.
+- [ ] Calcular automáticamente el costo total.
+- [ ] Registrar quién realizó la operación y cuándo.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -181,20 +147,18 @@ para mantener el stock actualizado y saber cuánto costó cada compra.
 
 ---
 
-### 6. Feature: Consulta de stock actual
+### 5. Feature: Consulta de stock actual
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como encargado de almacén,
-quiero ver el stock actual de todos los productos con opción de filtrar,
-para saber qué productos necesitan reabastecerse pronto.
+Como encargado de almacén, quiero consultar el stock de los productos para identificar aquellos que requieren reabastecimiento.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Muestra todos los productos con su stock actual, mínimo y categoría
-- [ ] Se puede filtrar por categoría o buscar por nombre
-- [ ] Los productos con stock igual o menor al mínimo se resaltan visualmente
-- [ ] La información está siempre actualizada
+- [ ] Mostrar stock actual, stock mínimo y categoría.
+- [ ] Permitir búsqueda por nombre o categoría.
+- [ ] Resaltar productos con stock crítico.
+- [ ] Mostrar información actualizada.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -210,20 +174,18 @@ para saber qué productos necesitan reabastecerse pronto.
 
 ---
 
-### 7. Feature: Registro de distribución por housekeeping
+### 6. Feature: Registro de distribución por housekeeping
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como personal de housekeeping,
-quiero registrar los insumos que uso en cada habitación,
-para llevar el control del consumo y que el stock se descuente correctamente.
+Como personal de housekeeping, quiero registrar los insumos utilizados en cada habitación para mantener un control del consumo y actualizar el stock de manera automática.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Puede registrar el insumo usado, la cantidad y la habitación atendida
-- [ ] El stock del producto baja automáticamente al confirmar el registro
-- [ ] El sistema no permite registrar más cantidad de la que hay en stock
-- [ ] Se puede revisar el historial de distribuciones por fecha o habitación
+- [ ] Registrar el insumo utilizado, la cantidad y la habitación atendida.
+- [ ] Descontar automáticamente el stock al confirmar el registro.
+- [ ] No permitir registrar una cantidad mayor al stock disponible.
+- [ ] Consultar el historial de distribuciones por fecha o habitación.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -239,79 +201,102 @@ para llevar el control del consumo y que el stock se descuente correctamente.
 
 ---
 
-### 8. Feature: Importación de productos desde CSV
+### 7. Feature: Reporte de consumo de inventario
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como administrador,
-quiero cargar el catálogo de productos desde un archivo CSV,
-para no tener que ingresar uno por uno cuando hay muchos productos.
+Como gerente, quiero generar un reporte de consumo dentro de un rango de fechas y descargarlo en PDF para analizar el uso de los insumos y facilitar la planificación de futuras compras.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Acepta archivos .csv con columnas: nombre, categoría y unidad de medida
-- [ ] Muestra un resumen de cuántos productos se importaron y cuáles tuvieron error
-- [ ] Indica el motivo del error por cada fila que falló
-- [ ] No sobreescribe productos que ya existen en el sistema
-- [ ] Hay un archivo de ejemplo descargable para guiar el formato
+- [ ] Seleccionar una fecha de inicio y una fecha de fin.
+- [ ] Mostrar el producto, la categoría y la cantidad consumida durante el período.
+- [ ] Agrupar la información por categoría con su respectivo subtotal.
+- [ ] Permitir descargar el reporte en formato PDF.
+- [ ] Mostrar un mensaje cuando no existan movimientos en el período seleccionado.
+
+| Propiedad | Valor |
+|-----------|-------|
+| Status | Todo |
+| Assignee | Fabricio Carreño |
+| Labels | `enhancement` `backend` `frontend` |
+| Priority | P1 |
+| Size | M |
+| Estimate | 5 pts |
+| Iteration | Sprint 2 |
+| Start Date | 2026-07-01 |
+| Target Date | 2026-07-10 |
+
+---
+
+### 8. Feature: Visualización de alertas de stock mínimo
+
+#### Historia de Usuario
+
+Como gerente, quiero consultar los productos con stock crítico para identificar oportunamente cuáles requieren reabastecimiento.
+
+#### Criterios de aceptación
+
+- [ ] Mostrar únicamente los productos cuyo stock sea igual o menor al stock mínimo.
+- [ ] Incluir nombre del producto, categoría, stock actual, stock mínimo y cantidad faltante.
+- [ ] Ordenar los productos desde el más urgente hasta el menos urgente.
+- [ ] Mostrar en el menú lateral la cantidad de productos en estado crítico.
+- [ ] Permitir crear una solicitud de reabastecimiento desde la misma pantalla.
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
 | Assignee | Romina Rebaza |
-| Labels | `enhancement` `backend` `frontend` |
-| Priority | P2 |
-| Size | M |
-| Estimate | 5 pts |
+| Labels | `enhancement` `frontend` `backend` |
+| Priority | P1 |
+| Size | S |
+| Estimate | 3 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-06-09 |
-| Target Date | 2026-06-18 |
+| Start Date | 2026-07-08 |
+| Target Date | 2026-07-17 |
 
 ---
 
-### 9. Feature: Historial de precios por proveedor
+### 9. Feature: Configuración del sistema
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como encargado de almacén,
-quiero consultar el historial de precios de cada producto por proveedor,
-para comparar cuánto ha costado cada insumo en distintas fechas.
+Como administrador, quiero configurar el stock mínimo, las categorías y las unidades de medida para adaptar el sistema a las necesidades operativas del hotel.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Se puede filtrar por proveedor o por producto
-- [ ] Muestra: fecha, producto, cantidad comprada, precio por unidad y costo total
-- [ ] Los registros aparecen del más reciente al más antiguo
-- [ ] Muestra el precio promedio del producto con ese proveedor
+- [ ] Definir y modificar el stock mínimo de cada producto.
+- [ ] Crear, editar y eliminar categorías de productos.
+- [ ] Crear, editar y eliminar unidades de medida.
+- [ ] Impedir la eliminación de categorías que tengan productos asociados.
+- [ ] Reflejar los cambios inmediatamente en el sistema.
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Sebastian García |
+| Assignee | Juan Loyola |
 | Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
 | Estimate | 5 pts |
-| Iteration | Sprint 2 |
-| Start Date | 2026-06-12 |
-| Target Date | 2026-06-20 |
+| Iteration | Sprint 1 |
+| Start Date | 2026-05-30 |
+| Target Date | 2026-06-05 |
 
 ---
 
 ### 10. Feature: Notificaciones automáticas de stock crítico
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como encargado de almacén,
-quiero recibir un correo automático cuando el stock de un producto baje del mínimo,
-para poder hacer el pedido a tiempo y evitar que se acabe.
+Como encargado de almacén, quiero recibir una notificación por correo cuando un producto alcance el stock mínimo para realizar el reabastecimiento de forma oportuna.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] El sistema detecta automáticamente cuando el stock llega o baja del mínimo
-- [ ] Envía un correo al encargado de almacén y al gerente con el nombre del producto, stock actual y el mínimo configurado
-- [ ] No manda el mismo correo dos veces para el mismo producto hasta que el stock vuelva a subir
-- [ ] El correo incluye un enlace para ir directamente al módulo de solicitudes
+- [ ] Detectar automáticamente cuando el stock llegue o sea inferior al mínimo configurado.
+- [ ] Enviar un correo al encargado de almacén y al gerente con la información del producto.
+- [ ] Evitar el envío repetido de la misma notificación mientras el producto continúe en estado crítico.
+- [ ] Incluir un enlace directo al módulo de solicitudes de reabastecimiento.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -329,19 +314,17 @@ para poder hacer el pedido a tiempo y evitar que se acabe.
 
 ### 11. Feature: Módulo de solicitudes de reabastecimiento
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como encargado de almacén,
-quiero enviar solicitudes de reabastecimiento al gerente para que las apruebe,
-para que quede un registro formal de cada pedido y su estado.
+Como encargado de almacén, quiero enviar solicitudes de reabastecimiento al gerente para mantener un registro del pedido y conocer su estado hasta que sea aprobado o rechazado.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Puede crear una solicitud indicando producto, cantidad y motivo
-- [ ] La solicitud aparece como pendiente hasta que el gerente la revise
-- [ ] El gerente puede aprobarla o rechazarla, y si rechaza debe escribir el motivo
-- [ ] El encargado puede ver el estado de todas sus solicitudes enviadas
-- [ ] El encargado recibe un correo cuando su solicitud es aprobada o rechazada
+- [ ] Crear una solicitud indicando el producto, la cantidad requerida y el motivo.
+- [ ] Registrar la solicitud con estado **Pendiente** hasta su revisión.
+- [ ] Permitir que el gerente apruebe o rechace la solicitud, indicando un motivo en caso de rechazo.
+- [ ] Consultar el estado de todas las solicitudes realizadas.
+- [ ] Enviar una notificación por correo cuando la solicitud sea aprobada o rechazada.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -359,19 +342,17 @@ para que quede un registro formal de cada pedido y su estado.
 
 ### 12. Feature: Dashboard de indicadores para el gerente
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como gerente,
-quiero ver un panel con los indicadores principales del inventario,
-para tener una visión rápida del estado actual sin revisar reporte por reporte.
+Como gerente, quiero visualizar un panel con los principales indicadores del inventario para conocer rápidamente el estado general del sistema.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Muestra los 5 productos más consumidos en los últimos 30 días
-- [ ] Muestra el consumo total agrupado por categoría en un gráfico
-- [ ] Muestra cómo ha variado el stock en los últimos 30 días
-- [ ] La información se actualiza cada vez que entra al panel
-- [ ] Solo el gerente puede ver esta pantalla
+- [ ] Mostrar los cinco productos con mayor consumo en los últimos 30 días.
+- [ ] Mostrar el consumo total agrupado por categoría mediante un gráfico.
+- [ ] Visualizar la evolución del stock durante los últimos 30 días.
+- [ ] Actualizar la información cada vez que se ingrese al panel.
+- [ ] Restringir el acceso únicamente al gerente.
 
 | Propiedad | Valor |
 |-----------|-------|
@@ -387,55 +368,78 @@ para tener una visión rápida del estado actual sin revisar reporte por reporte
 
 ---
 
-### 13. Feature: Reporte de consumo de inventario
+### 13. Feature: Importación de productos desde CSV
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como gerente,
-quiero generar un reporte de consumo por rango de fechas y descargarlo en PDF,
-para analizar cuánto se usa de cada insumo y planificar las compras.
+Como administrador, quiero importar el catálogo de productos desde un archivo CSV para agilizar el registro de grandes cantidades de información.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Puede elegir una fecha de inicio y una fecha de fin
-- [ ] El reporte muestra el producto, categoría y cantidad consumida en ese período
-- [ ] Los datos están agrupados por categoría con un subtotal por cada una
-- [ ] Se puede descargar en PDF
-- [ ] Si no hay movimientos en ese rango, muestra un mensaje indicándolo
+- [ ] Aceptar archivos `.csv` con las columnas nombre, stockActual, stockMinimo, categoría y unidad de medida.
+- [ ] Mostrar un resumen con la cantidad de productos importados y los registros con error.
+- [ ] Indicar el motivo de cada error detectado.
+- [ ] No sobrescribir productos existentes.
+- [ ] Proporcionar un archivo de ejemplo para facilitar la importación.
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Fabricio Carreño |
+| Assignee | Romina Rebaza |
 | Labels | `enhancement` `backend` `frontend` |
+| Priority | P2 |
+| Size | M |
+| Estimate | 5 pts |
+| Iteration | Sprint 2 |
+| Start Date | 2026-06-09 |
+| Target Date | 2026-06-18 |
+
+---
+
+### 14. Feature: Historial de precios por proveedor
+
+#### Historia de Usuario
+
+Como encargado de almacén, quiero consultar el historial de precios de los productos por proveedor para comparar costos y facilitar futuras compras.
+
+#### Criterios de aceptación
+
+- [ ] Filtrar la información por proveedor o por producto.
+- [ ] Mostrar fecha, producto, cantidad comprada, precio unitario y costo total.
+- [ ] Ordenar los registros del más reciente al más antiguo.
+- [ ] Mostrar el precio promedio del producto para cada proveedor.
+
+| Propiedad | Valor |
+|-----------|-------|
+| Status | Todo |
+| Assignee | Sebastian García |
+| Labels | `enhancement` `backend` `frontend` `database` |
 | Priority | P1 |
 | Size | M |
 | Estimate | 5 pts |
 | Iteration | Sprint 2 |
-| Start Date | 2026-07-01 |
-| Target Date | 2026-07-10 |
+| Start Date | 2026-06-12 |
+| Target Date | 2026-06-20 |
 
 ---
 
-### 14. Feature: Reporte de costos por proveedor
+### 15. Feature: Reporte de costos por proveedor
 
-## Historia de Usuario
+#### Historia de Usuario
 
-Como gerente,
-quiero ver un reporte de cuánto se ha gastado por proveedor y descargarlo en PDF,
-para saber con quién conviene seguir comprando.
+Como gerente, quiero consultar el gasto realizado por proveedor y descargar el reporte en PDF para apoyar la toma de decisiones sobre futuras compras.
 
-## Criterios de Aceptación
+#### Criterios de aceptación
 
-- [ ] Se puede filtrar por proveedor, por fechas o por ambos
-- [ ] Muestra por proveedor: productos comprados, cantidades, precio por unidad y total gastado
-- [ ] Se puede descargar en PDF con el mismo contenido que se ve en pantalla
-- [ ] El PDF muestra el total por proveedor y un total general al final
+- [ ] Filtrar el reporte por proveedor, por rango de fechas o por ambos.
+- [ ] Mostrar los productos comprados, las cantidades, el precio unitario y el gasto total por proveedor.
+- [ ] Permitir la descarga del reporte en formato PDF.
+- [ ] Mostrar el total por proveedor y un total general al finalizar el reporte.
 
 | Propiedad | Valor |
 |-----------|-------|
 | Status | Todo |
-| Assignee | Fabricio Carreño |
+| Assignee | Sebastian García |
 | Labels | `enhancement` `backend` `frontend` |
 | Priority | P1 |
 | Size | M |
@@ -446,50 +450,29 @@ para saber con quién conviene seguir comprando.
 
 ---
 
-### 15. Feature: Visualización de alertas de stock mínimo
+# Resumen
 
-## Historia de Usuario
+## Sprint
 
-Como gerente,
-quiero ver en cualquier momento qué productos tienen stock crítico,
-para saber qué hay que pedir con más urgencia.
-
-## Criterios de Aceptación
-
-- [ ] Muestra solo los productos con stock actual igual o menor al mínimo
-- [ ] Incluye: nombre del producto, categoría, stock actual, stock mínimo y cuánto falta
-- [ ] Los productos se ordenan del más urgente al menos urgente
-- [ ] El menú lateral muestra cuántos productos están en alerta en ese momento
-- [ ] Desde esta pantalla se puede crear una solicitud de reabastecimiento directamente
-
-| Propiedad | Valor |
-|-----------|-------|
-| Status | Todo |
-| Assignee | Romina Rebaza |
-| Labels | `enhancement` `frontend` `backend` |
-| Priority | P1 |
-| Size | S |
-| Estimate | 3 pts |
-| Iteration | Sprint 2 |
-| Start Date | 2026-07-08 |
-| Target Date | 2026-07-17 |
-
----
-
-## Resumen
-
-| Sprint | HUs | Puntos | Fechas |
-|--------|-----|--------|--------|
-| Sprint 1 | HU-01 al HU-06 | 31 pts | 2026-05-25 → 2026-06-07 |
-| Sprint 2 | HU-07 al HU-15 | 57 pts | 2026-06-09 → 2026-07-17 |
+| Sprint | Historias de usuario | Puntos | Fechas |
+|--------|----------------------|--------|--------|
+| Sprint 1 | HU-01, HU-02, HU-03, HU-04, HU-05, HU-09 | 31 pts | 2026-05-25 → 2026-06-07 |
+| Sprint 2 | HU-06, HU-07, HU-08, HU-10, HU-11, HU-12, HU-13, HU-14, HU-15 | 57 pts | 2026-06-09 → 2026-07-17 |
 | **Total** | **15 HU** | **88 pts** | **8 semanas** |
 
+## Release
+
+| Release | Historias de usuario |
+|---------|----------------------|
+| Release 1 | HU-01 a HU-09 |
+| Release 2 | HU-10 a HU-15 |
+
 ---
 
-## Prioridades
+# Prioridades
 
-| Nivel | Significado | HUs |
-|-------|-------------|-----|
-| P0 | Crítico — el sistema no funciona sin esto | HU-01, HU-02, HU-03, HU-05 |
-| P1 | Alta — funcionalidad importante del Release | HU-04, HU-06, HU-07, HU-09, HU-10, HU-11, HU-12, HU-13, HU-14, HU-15 |
-| P2 | Media — mejora de comodidad | HU-08 |
+| Nivel | Significado | Historias de usuario |
+|-------|-------------|----------------------|
+| P0 | Funcionalidades críticas para el funcionamiento del sistema. | HU-01, HU-02, HU-03, HU-04 |
+| P1 | Funcionalidades principales del proyecto. | HU-05, HU-06, HU-07, HU-08, HU-09, HU-10, HU-11, HU-12, HU-14, HU-15 |
+| P2 | Funcionalidades complementarias orientadas a mejorar la usabilidad. | HU-13 |

@@ -11,6 +11,15 @@ import com.g2.demo.repository.UnidadMedidaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.g2.demo.dto.ImportacionCsvError;
+import com.g2.demo.dto.ImportacionCsvResultado;
+import com.g2.demo.factory.ProductoCsvFactory;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,15 +32,18 @@ public class ProductoService {
     private final CategoriaRepository categoriaRepository;
     private final UnidadMedidaRepository unidadMedidaRepository;
     private final MovimientoInventarioRepository movimientoInventarioRepository;
+    private final NotificacionStockService notificacionStockService;
 
     public ProductoService(ProductoRepository productoRepository,
                            CategoriaRepository categoriaRepository,
                            UnidadMedidaRepository unidadMedidaRepository,
-                           MovimientoInventarioRepository movimientoInventarioRepository) {
+                           MovimientoInventarioRepository movimientoInventarioRepository,
+                           NotificacionStockService notificacionStockService) {
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
         this.unidadMedidaRepository = unidadMedidaRepository;
         this.movimientoInventarioRepository = movimientoInventarioRepository;
+        this.notificacionStockService = notificacionStockService;
     }
 
     public List<Producto> listar() {
@@ -63,7 +75,9 @@ public class ProductoService {
         producto.setStockMinimo(request.getStockMinimo() != null ? request.getStockMinimo() : BigDecimal.ZERO);
         asignarRelaciones(producto, request);
 
-        return productoRepository.save(producto);
+        Producto guardado = productoRepository.save(producto);
+        notificacionStockService.evaluarStockCritico(guardado);
+        return guardado;
     }
 
     public Producto actualizar(Long id, ProductoRequest request) {
@@ -85,7 +99,9 @@ public class ProductoService {
         }
         if (request.getStockMinimo() != null) existente.setStockMinimo(request.getStockMinimo());
         asignarRelaciones(existente, request);
-        return productoRepository.save(existente);
+        Producto guardado = productoRepository.save(existente);
+        notificacionStockService.evaluarStockCritico(guardado);
+        return guardado;
     }
 
     public void eliminar(Long id) {
@@ -134,5 +150,55 @@ public class ProductoService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unidad de medida no encontrada"));
             producto.setUnidad(unidad);
         }
+    }
+    public ImportacionCsvResultado importarCsv(MultipartFile archivo) {
+        if (archivo == null || archivo.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe adjuntar un archivo CSV");
+        }
+
+        ImportacionCsvResultado resultado = new ImportacionCsvResultado();
+
+        try (BufferedReader lector = new BufferedReader(new InputStreamReader(archivo.getInputStream()))) {
+            String encabezado = lector.readLine();
+            if (encabezado == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El archivo esta vacio");
+            }
+            String[] columnas = encabezado.split(",");
+            for (String requerida : List.of("nombre", "stockMinimo")) {
+                boolean existe = false;
+                for (String columna : columnas) {
+                    if (columna.trim().equalsIgnoreCase(requerida)) existe = true;
+                }
+                if (!existe) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Falta la columna obligatoria: " + requerida);
+                }
+            }
+
+            String linea;
+            int numeroLinea = 1;
+            while ((linea = lector.readLine()) != null) {
+                numeroLinea++;
+                if (linea.isBlank()) continue;
+                resultado.setTotalFilas(resultado.getTotalFilas() + 1);
+
+                String[] valores = linea.split(",", -1);
+                Map<String, String> fila = new HashMap<>();
+                for (int i = 0; i < columnas.length && i < valores.length; i++) {
+                    fila.put(columnas[i].trim(), valores[i].trim());
+                }
+
+                try {
+                    crear(ProductoCsvFactory.crearDesdeFila(fila, categoriaRepository, unidadMedidaRepository));
+                    resultado.setExitosos(resultado.getExitosos() + 1);
+                } catch (IllegalArgumentException | ResponseStatusException e) {
+                    String mensaje = e instanceof ResponseStatusException rse ? rse.getReason() : e.getMessage();
+                    resultado.getErrores().add(new ImportacionCsvError(numeroLinea, fila.get("nombre"), mensaje));
+                }
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo leer el archivo CSV");
+        }
+
+        return resultado;
     }
 }

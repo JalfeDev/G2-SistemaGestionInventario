@@ -52,6 +52,14 @@ export const authService = {
 export const productoService = {
   ...crud('/productos'),
   alertas: () => api.get('/productos/alertas'),
+  importarCsv: (archivo) => {
+    const formData = new FormData()
+    formData.append('archivo', archivo)
+    return api.post('/productos/importar-csv', formData)
+  },
+}
+export const importacionCsvService = {
+  importar: (archivo) => productoService.importarCsv(archivo),
 }
 
 export const proveedorService = crud('/proveedores')
@@ -66,9 +74,18 @@ export const distribucionService = {
   registrar: (data) => api.post('/distribuciones-insumos', data),
 }
 export const detalleDistribucionService = crud('/detalles-distribucion')
-export const solicitudService = crud('/solicitudes-compra')
+export const solicitudService = {
+  ...crud('/solicitudes-compra'),
+  listarPorUsuario: (usuarioId) => api.get(`/solicitudes-compra/usuario/${usuarioId}`),
+  revisar: (id, payload) => api.put(`/solicitudes-compra/${id}/revisar`, payload),
+}
+export const solicitudReabastecimientoService = solicitudService
 export const detalleSolicitudService = crud('/detalles-solicitud')
 export const notificacionService = crud('/notificaciones')
+export const notificacionStockService = {
+  listar: () => api.get('/notificaciones-stock'),
+  ultimas: () => api.get('/notificaciones-stock/ultimas'),
+}
 export const movimientoService = crud('/movimientos-inventario')
 export const usuarioService = {
   ...crud('/usuarios'),
@@ -82,6 +99,20 @@ export const habitacionService = crud('/habitaciones')
 export const reporteService = {
   consultar: (fechaInicio, fechaFin) => api.get('/reportes/consumo', { params: { fechaInicio, fechaFin } }),
   descargarPdf: (fechaInicio, fechaFin) => api.get('/reportes/consumo/pdf', { params: { fechaInicio, fechaFin }, responseType: 'blob' }),
+}
+export const reporteCostoProveedorService = {
+  consultar: (proveedorId, fechaInicio, fechaFin) =>
+    api.get('/reportes/costos-proveedor', { params: { proveedorId, fechaInicio, fechaFin } }),
+  descargarPdf: (proveedorId, fechaInicio, fechaFin) =>
+    api.get('/reportes/costos-proveedor/pdf', { params: { proveedorId, fechaInicio, fechaFin }, responseType: 'blob' }),
+}
+export const reporteCostosProveedorService = reporteCostoProveedorService
+export const dashboardService = {
+  consultar: () => api.get('/dashboard'),
+}
+export const historialPreciosService = {
+  consultar: (productoId, proveedorId) =>
+    api.get('/ingresos-inventario/historial-precios', { params: { productoId, proveedorId } }),
 }
 
 export function isCanceledRequest(error) {

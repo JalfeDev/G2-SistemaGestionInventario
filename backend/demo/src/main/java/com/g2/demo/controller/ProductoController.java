@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.g2.demo.dto.ImportacionCsvResultado;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -47,6 +50,12 @@ public class ProductoController {
     @ResponseStatus(HttpStatus.CREATED)
     public Producto crear(@RequestBody ProductoRequest request) {
         return productoService.crear(request);
+    }
+
+    @PostMapping("/importar-csv")
+    @PreAuthorize("hasAnyRole('GERENTE','ADMINISTRADOR')")
+    public ImportacionCsvResultado importarCsv(@RequestParam("archivo") MultipartFile archivo) {
+        return productoService.importarCsv(archivo);
     }
 
     @PutMapping("/{id}")

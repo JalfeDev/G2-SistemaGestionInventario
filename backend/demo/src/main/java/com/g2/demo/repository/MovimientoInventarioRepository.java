@@ -12,4 +12,7 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
 
     List<MovimientoInventario> findByTipoMovimientoAndFechaMovimientoGreaterThanEqualAndFechaMovimientoLessThanOrderByFechaMovimientoAsc(
             String tipoMovimiento, LocalDateTime fechaInicio, LocalDateTime fechaFinExclusiva);
+
+    List<MovimientoInventario> findByFechaMovimientoGreaterThanEqualAndFechaMovimientoLessThan(
+            LocalDateTime fechaInicio, LocalDateTime fechaFinExclusiva);
 }

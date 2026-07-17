@@ -1,27 +1,31 @@
 import { useState } from 'react'
 import { Card, Empty, Icon, Loader, Notice, PageHeader } from '../components/ui'
-import { categoriaService, productoService, unidadService } from '../services/api'
-import { useApiResource } from '../hooks/useApiResource'
-import { fallbackCategorias, fallbackUnidades } from '../data/fallbackData'
+import { getApiError, importacionCsvService } from '../services/api'
 
 const COLUMNAS = ['nombre', 'stockMinimo']
 
-// Patrón Service Layer — todas las llamadas al backend pasan por los services de api.js
 export default function ImportacionCsv() {
-  const categorias = useApiResource(categoriaService.listar, fallbackCategorias)
-  const unidades   = useApiResource(unidadService.listar,   fallbackUnidades)
-
   const [rows,      setRows]      = useState([])
+  const [file,      setFile]      = useState(null)
   const [filename,  setFilename]  = useState('')
   const [csvError,  setCsvError]  = useState('')
   const [importing, setImporting] = useState(false)
   const [resultado, setResultado] = useState(null)
 
-  // ── Leer y parsear el CSV localmente ──────────────────────────────────────
   function readFile(event) {
-    const file = event.target.files?.[0]
-    if (!file) return
-    setFilename(file.name)
+    const selected = event.target.files?.[0]
+    if (!selected) return
+    if (!selected.name.toLowerCase().endsWith('.csv')) {
+      setFile(null)
+      setFilename('')
+      setRows([])
+      setResultado(null)
+      setCsvError('Selecciona un archivo con extension .csv.')
+      event.target.value = ''
+      return
+    }
+    setFile(selected)
+    setFilename(selected.name)
     setCsvError('')
     setResultado(null)
     setRows([])
@@ -46,37 +50,44 @@ export default function ImportacionCsv() {
       })
       setRows(parsed)
     }
-    reader.readAsText(file)
+    reader.onerror = () => setCsvError('No se pudo leer el archivo seleccionado.')
+    reader.readAsText(selected)
   }
 
-  // ── Importar al backend usando productoService.crear() por cada fila ──────
+  function descargarPlantilla() {
+    const contenido = 'nombre,stockActual,stockMinimo,categoria,unidad\nShampoo,20,5,Amenidades,Unidad\nToallas,50,10,Lenceria,Unidad\n'
+    const blob = new Blob([contenido], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'plantilla-productos.csv'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   async function importar() {
-    if (rows.length === 0) return
+    if (!file) {
+      setCsvError('Selecciona un archivo CSV antes de importar.')
+      return
+    }
     setImporting(true)
     setResultado(null)
 
-    let exitosos = 0
-    const errores = []
-
-    for (const row of rows) {
-      try {
-        await productoService.crear({
-          nombre:      row.nombre,
-          stockActual: Number(row.stockActual || 0),
-          stockMinimo: Number(row.stockMinimo  || 0),
-          categoriaId: row.categoriaId ? Number(row.categoriaId) : null,
-          unidadId:    row.unidadId    ? Number(row.unidadId)    : null,
-        })
-        exitosos++
-      } catch (error) {
-        const msg = error?.response?.data?.message || 'Error desconocido'
-        errores.push({ linea: row.linea, nombre: row.nombre, msg })
+    try {
+      const { data } = await importacionCsvService.importar(file)
+      setResultado({ totalFilas: data.totalFilas || 0, exitosos: data.exitosos || 0, errores: data.errores || [] })
+      if ((data.exitosos || 0) > 0 && (data.errores || []).length === 0) {
+        setRows([])
+        setFile(null)
+        setFilename('')
       }
+    } catch (error) {
+      setCsvError(getApiError(error, 'No se pudo importar el archivo.'))
+    } finally {
+      setImporting(false)
     }
-
-    setImporting(false)
-    setResultado({ exitosos, errores })
-    if (exitosos > 0) setRows([])
   }
 
   return (
@@ -86,46 +97,13 @@ export default function ImportacionCsv() {
         description="Carga lotes de productos desde un archivo CSV al catálogo del sistema."
       />
 
-      {/* Referencia de IDs disponibles */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-        <Card>
-          <div className="card-title"><div><span>Referencia</span><h3>Categorías disponibles</h3></div></div>
-          {categorias.loading ? <Loader rows={2} /> : (
-            <div className="table-wrap">
-              <table>
-                <thead><tr><th>ID</th><th>Nombre</th></tr></thead>
-                <tbody>
-                  {categorias.data.map((c) => (
-                    <tr key={c.id}><td><strong>{c.id}</strong></td><td>{c.nombre}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-        <Card>
-          <div className="card-title"><div><span>Referencia</span><h3>Unidades disponibles</h3></div></div>
-          {unidades.loading ? <Loader rows={2} /> : (
-            <div className="table-wrap">
-              <table>
-                <thead><tr><th>ID</th><th>Nombre</th><th>Abrev.</th></tr></thead>
-                <tbody>
-                  {unidades.data.map((u) => (
-                    <tr key={u.id}><td><strong>{u.id}</strong></td><td>{u.nombre}</td><td>{u.abreviatura}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-      </div>
-
       {/* Upload */}
       <Card className="upload-card">
         <div className="upload-icon"><Icon name="upload" size={28} /></div>
         <h3>Selecciona un archivo CSV</h3>
-        <p>Columnas: <strong>nombre</strong>, stockActual, <strong>stockMinimo</strong>, categoriaId, unidadId</p>
-        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Obligatorias en negrita. Usa los IDs de las tablas de referencia.</p>
+        <p>Columnas: <strong>nombre</strong>, stockActual, <strong>stockMinimo</strong>, categoria, unidad</p>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Obligatorias en negrita. Usa el nombre real de la categoria y la unidad de medida (ej. Amenidades, Unidad).</p>
+        <button className="button subtle" onClick={descargarPlantilla}>Descargar plantilla</button>
         <label className="button primary file-button">
           Elegir archivo
           <input type="file" accept=".csv,text/csv" onChange={readFile} />
@@ -139,10 +117,11 @@ export default function ImportacionCsv() {
       {resultado && (
         <Notice tone={resultado.errores.length === 0 ? 'success' : 'warning'}>
           <strong>{resultado.exitosos} producto{resultado.exitosos !== 1 ? 's' : ''} importado{resultado.exitosos !== 1 ? 's' : ''} correctamente.</strong>
+          <p>{resultado.totalFilas} fila{resultado.totalFilas !== 1 ? 's' : ''} procesada{resultado.totalFilas !== 1 ? 's' : ''}; {resultado.errores.length} rechazada{resultado.errores.length !== 1 ? 's' : ''}.</p>
           {resultado.errores.length > 0 && (
             <ul style={{ marginTop: '8px' }}>
               {resultado.errores.map((e) => (
-                <li key={e.linea}>Línea {e.linea} — <strong>{e.nombre}</strong>: {e.msg}</li>
+                <li key={e.linea}>Línea {e.linea} — <strong>{e.nombre}</strong>: {e.mensaje}</li>
               ))}
             </ul>
           )}
@@ -164,8 +143,8 @@ export default function ImportacionCsv() {
                   <th>Nombre</th>
                   <th>Stock actual</th>
                   <th>Stock mínimo</th>
-                  <th>Categoría ID</th>
-                  <th>Unidad ID</th>
+                  <th>Categoría</th>
+                  <th>Unidad</th>
                 </tr>
               </thead>
               <tbody>
@@ -175,8 +154,8 @@ export default function ImportacionCsv() {
                     <td><strong>{row.nombre}</strong></td>
                     <td>{row.stockActual || '0'}</td>
                     <td>{row.stockMinimo}</td>
-                    <td>{row.categoriaId || '-'}</td>
-                    <td>{row.unidadId    || '-'}</td>
+                    <td>{row.categoria || '-'}</td>
+                    <td>{row.unidad    || '-'}</td>
                   </tr>
                 ))}
               </tbody>

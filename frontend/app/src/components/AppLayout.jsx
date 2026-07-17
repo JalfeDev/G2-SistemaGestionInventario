@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { authService } from '../services/api'
+import { useApiResource } from '../hooks/useApiResource'
+import { authService, productoService } from '../services/api'
 import { getStoredUser, roleLabel, ROLES } from '../utils/roles'
 import { Icon } from './ui'
 
@@ -8,10 +9,15 @@ const navigation = [
   { path: 'usuarios', icon: 'users', label: 'Usuarios', roles: [ROLES.ADMINISTRADOR] },
   { path: 'productos', icon: 'box', label: 'Productos', roles: [ROLES.ADMINISTRADOR] },
   { path: 'configuracion', icon: 'clipboard', label: 'Configuracion', roles: [ROLES.ADMINISTRADOR] },
+  { path: 'importacion-csv', icon: 'upload', label: 'Importar CSV', roles: [ROLES.ADMINISTRADOR] },
   { path: 'reporte-consumo', icon: 'chart', label: 'Reportes', roles: [ROLES.GERENTE] },
-  { path: 'alertas', icon: 'bell', label: 'Alertas', roles: [ROLES.GERENTE] },
+  { path: 'reporte-costos-proveedor', icon: 'chart', label: 'Costos por proveedor', roles: [ROLES.GERENTE] },
+  { path: 'alertas', icon: 'bell', label: 'Alertas', roles: [ROLES.GERENTE, ROLES.ADMINISTRADOR] },
+  { path: 'dashboard', icon: 'chart', label: 'Dashboard', roles: [ROLES.GERENTE] },
   { path: 'entradas', icon: 'arrowDown', label: 'Entradas', roles: [ROLES.ENCARGADO_ALMACEN] },
   { path: 'stock', icon: 'box', label: 'Stock', roles: [ROLES.ENCARGADO_ALMACEN] },
+  { path: 'solicitudes', icon: 'clipboard', label: 'Solicitudes', roles: [ROLES.ENCARGADO_ALMACEN, ROLES.GERENTE] },
+  { path: 'historial-precios', icon: 'chart', label: 'Historial de precios', roles: [ROLES.ENCARGADO_ALMACEN, ROLES.GERENTE] },
   { path: 'distribuciones', icon: 'rooms', label: 'Distribuciones', roles: [ROLES.HOUSEKEEPER] },
 ]
 
@@ -19,6 +25,7 @@ export default function AppLayout() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const user = getStoredUser()
+  const alertasActivas = useApiResource(productoService.alertas)
 
   async function logout() {
     try {
@@ -42,6 +49,7 @@ export default function AppLayout() {
           {navigation.filter((item) => item.roles.includes(user.rol)).map((item) => (
             <NavLink key={item.path} to={`/${item.path}`} onClick={() => setOpen(false)} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
               <Icon name={item.icon} size={18} /><span>{item.label}</span>
+              {item.path === 'alertas' && alertasActivas.data.length > 0 && <span className="badge badge-danger">{alertasActivas.data.length}</span>}
             </NavLink>
           ))}
         </nav>
