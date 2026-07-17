@@ -184,7 +184,7 @@ export default function Solicitudes() {
                       <td><Badge tone={estadoTone(item.estado)}>{estadoLabel(item.estado)}</Badge></td>
                       {(esGerente || esAlmacen) && (
                         <td>
-                          {item.estado === 'PENDIENTE' && (
+                          {esGerente && item.estado === 'PENDIENTE' && (
                             <div className="form-actions">
                               <button className="button subtle" onClick={() => setRevisando({ id: item.id, accion: 'APROBADO' })}>Aprobar</button>
                               <button className="button subtle" onClick={() => setRevisando({ id: item.id, accion: 'RECHAZADO' })}>Rechazar</button>
